@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "File launcher",
+    "description": "Inventory files by conversation, sent-by-me, project, pinned, or history with project/conversation grouping and configurable auto-refresh; master-detail Source/Type filters; PDF/Office page previews with persistent toolbar; missing-file ghost rows and deletion tombstones; resolve user @path files and folders; attach files or insert removable @ references; Settings page for theme (follow DSH/light/dark/system), refresh, preview limits, and custom archive folder; lazy persisted sent index; pin paths against context compaction; archive copies with an archived badge.",
+    "detail": "docs/DETAIL.md"
+  }
+}

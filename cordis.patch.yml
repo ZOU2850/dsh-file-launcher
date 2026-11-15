@@ -1,0 +1,5 @@
+# File Launcher bundle: mount the Host plugin under its package name. The same
+# package declares the browser entry in package.json `dsh.client`.
+- insert:
+    - id: file-launcher
+      name: dsh-file-launcher
