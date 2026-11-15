@@ -30,6 +30,16 @@ A **File launcher** tab for the DeepSeek Harness right Sidebar. It answers one q
 
 The package is a DSH bundle. Add the package directory through **Plugins → Add plugin** (or install it with the plugin manager), then reload the page. The right Sidebar's **+** guide now offers **File launcher**.
 
+**Install from GitHub:**
+
+1. Open **Plugins → Add plugin**.
+2. Choose the **default / GitHub** installation source (the mainland mirror is mainly for npm packages and may not proxy GitHub).
+3. Enter `https://github.com/ZOU2850/dsh-file-launcher`.
+4. Click **Install**.
+5. Fully quit and reopen DSH after installation (1.4.x changes the Host scanning and settings modules).
+
+If GitHub installation fails, use the local checkout path in the same field. Remove or disable any existing `dsh-file-launcher` install first to avoid a duplicate instance.
+
 The Host half needs the Web profile's `tools`, `fs`, `sessionQuery`, `connection`, and `attachments` services. The browser half registers a page-type tab plus the header and composer quick entries, so no resource pattern or extra config is required.
 
 ## Usage
