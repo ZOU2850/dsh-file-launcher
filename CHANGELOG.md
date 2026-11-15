@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.3
+
+### Fixed
+
+- **Insert reference works again**: the row/bulk actions use the composer `inputActions` path directly instead of trying a native file-drop attachment first. A captured revision is retried once, and if the Host exposes no `InputActions`, the plugin falls back to a plain-text insertion into the Lexical composer before ever copying to the clipboard.
+
 ## 1.4.2
 
 ### Fixed

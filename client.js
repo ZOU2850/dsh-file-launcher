@@ -221,7 +221,28 @@ window.__ModuleLoader__.load({
       return `dsh-resource://file/session/${encodeSegment(sessionId)}/${relative.split('/').map(encodeSegment).join('/')}`
     }
 
-    /** Composer reference text for one file. */
+    /** Last-resort plain-text insertion when the composer's InputActions are unavailable. */
+    function insertComposerTextFallback(text) {
+      if (typeof document === 'undefined' || typeof window === 'undefined') return false
+      const editor = document.querySelector('[data-composer-card] [contenteditable="true"]')
+        || document.querySelector('[contenteditable="true"]')
+      if (editor === null) return false
+      try {
+        editor.focus()
+        const selection = window.getSelection()
+        if (selection === null) return false
+        const range = document.createRange()
+        range.selectNodeContents(editor)
+        range.collapse(false)
+        selection.removeAllRanges()
+        selection.addRange(range)
+        return document.execCommand('insertText', false, text)
+      } catch {
+        return false
+      }
+    }
+
+
     function referenceText(absolutePath, cwd) {
       const absolute = slashPath(absolutePath)
       const root = typeof cwd === 'string' ? slashPath(cwd).replace(/\/+$/, '') : ''
@@ -1182,14 +1203,22 @@ window.__ModuleLoader__.load({
           const text = `${files.map(file => referenceText(file.path, absolute ? undefined : cwd)).join(' ')} `
           if (inputActions && typeof inputActions.captureInsertion === 'function' && typeof inputActions.insertText === 'function') {
             try {
-              const span = inputActions.captureInsertion()
-              if (inputActions.insertText(text, span)) {
-                if (!quiet) notify(t('toast.added'))
-                return 'inserted'
+              // A first insert can be rejected when another selection consumed
+              // the captured revision; retry once with a fresh span.
+              for (let attempt = 0; attempt < 2; attempt += 1) {
+                const span = inputActions.captureInsertion()
+                if (inputActions.insertText(text, span)) {
+                  if (!quiet) notify(t('toast.added'))
+                  return 'inserted'
+                }
               }
             } catch {
-              // Composer unavailable; copy instead.
+              // Composer unavailable; try the DOM fallback, then copy.
             }
+          }
+          if (insertComposerTextFallback(text)) {
+            if (!quiet) notify(t('toast.added'))
+            return 'inserted'
           }
           const ok = await copyText(text)
           if (!quiet) notify(ok ? t('toast.copied') : t('toast.copyFailed'))
@@ -1547,7 +1576,7 @@ window.__ModuleLoader__.load({
             h('span', { className: 'dfl-spacer' }),
             h('button', {
               type: 'button', className: 'dfl-button', disabled: count === 0,
-              onClick: () => attachToComposer(selectedFiles),
+              onClick: () => insertReferences(selectedFiles, { absolute: true }),
             }, t('action.addToInput')),
             h('button', {
               type: 'button', className: 'dfl-button', disabled: count === 0,
@@ -2015,7 +2044,7 @@ window.__ModuleLoader__.load({
             item('copyPath', t('menu.copyPath'), () => copyPath(file)),
             item('copyRef', t('menu.copyRef'), () => copyReference([file])),
             !isFolder && !isMissing && isImageFile(file) ? item('copyImage', t('menu.copyImage'), () => copyImageFile(file)) : null,
-            item('copyAttach', t('menu.attach'), () => attachToComposer([file])),
+            item('copyAttach', t('menu.attach'), () => insertReferences([file], { absolute: true })),
             !isFolder && !isMissing ? item('pin', pinned ? t('menu.unpin') : t('menu.pin'), () => pinned ? removePins([file]) : addPins([file])) : null,
             !isFolder && !isMissing ? item('archive', t('menu.archive'), () => archiveFiles([file])) : null,
           ].filter(Boolean)
