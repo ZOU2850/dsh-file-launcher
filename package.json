@@ -24,6 +24,7 @@
     "README.md",
     "README.zh.md",
     "CHANGELOG.md",
+    "RELEASING.md",
     "LICENSE"
   ],
   "scripts": {

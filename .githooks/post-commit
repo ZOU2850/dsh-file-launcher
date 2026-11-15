@@ -1,0 +1,12 @@
+#!/bin/sh
+# Publish every commit made on main. Local only: opt out with DFL_SKIP_PUSH=1.
+if [ "${DFL_SKIP_PUSH:-0}" = "1" ]; then
+  exit 0
+fi
+
+branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+if [ "$branch" != "main" ]; then
+  exit 0
+fi
+
+git push origin main
