@@ -101,7 +101,7 @@ No plugin config is required. Optional environment variables:
 - **Moved files cannot be found by magic.** Cross-drive moves with no new message/reference keep the old ghost; relink needs the new path to reappear in a scanned session or a manual re-send.
 - **Live refresh is periodic polling (default 60 s).** It is intentionally not a filesystem watcher; a just-created file appears on the next tick or via manual **Refresh**.
 - **Insert reference / Attach:** uses the optional `fileDrag` service when available, falling back to `@path` text in the composer or clipboard.
-- **User @ references:** a file the user sent as a plain-text `@path` (including absolute Desktop paths) is resolved and shown under **User** / **Sent by me**, not only browser file attachments.
+- **User @ paths are parsed**: a file is filed as a user file with a **Reference** badge, appears under both **User** and **Sent by me**, and clicking the badge or choosing **Trace reference origin** shows the source conversation, project, message position, time, and original text. Folders get an Explorer entry; special extensions are auto-classified. Quoted `@"path with spaces"` and quoted mentions directly after Chinese text are supported.
 - **Delete file** is permanent and cannot be undone; it is never triggered by archive or pin.
 - Pins are host-global and not part of Session export; they protect path memory, never delete or move files.
 - Archive copies are plain files with no version history; the original is kept.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.4
+
+### Added
+
+- **Reference origin and badge**: a user `@path` reference is shown under **User** / **Sent by me** with a clickable **引用 / Reference** badge and retains its source conversation, project, message sequence, timestamp, and excerpt. Right-click **追溯引用位置** opens the origin card.
+- The model-facing `file_launcher` tool marks reference rows with `referenced`.
+
 ## 1.4.3
 
 ### Fixed

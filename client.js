@@ -475,6 +475,7 @@ window.__ModuleLoader__.load({
         /* Panel state. */
         const [scope, setScope] = useState('session')
         const [preferences, setPreferences] = useState(null)
+        const [traceFile, setTraceFile] = useState(null)
         const scheme = useResolvedScheme(preferences?.appearanceTheme || 'host')
         const scopeTouched = useRef(false)
         const [historyId, setHistoryId] = useState(null)
@@ -523,6 +524,8 @@ window.__ModuleLoader__.load({
         const [archivedOnly, setArchivedOnly] = useState(false)
         const [expandedProjects, setExpandedProjects] = useState(() => new Map())
         const [expandedSessions, setExpandedSessions] = useState(() => new Map())
+        const [expandedCategories, setExpandedCategories] = useState(() => new Set())
+        const [groupMode, setGroupMode] = useState('category')
         const [viewer, setViewer] = useState(null)
         const [viewerState, setViewerState] = useState({ status: 'idle' })
         const viewerUrl = useRef(null)
@@ -719,6 +722,7 @@ window.__ModuleLoader__.load({
           setViewerState({ status: 'idle' })
           setContextMenu(null)
           setPendingDelete(null)
+          setTraceFile(null)
           setFilterMenu(null)
         }, [sessionId])
 
@@ -812,7 +816,7 @@ window.__ModuleLoader__.load({
         }, [baseFiles, query, category, sort, sourceFilter, archivedOnly])
 
         const fileGroups = useMemo(() => {
-          if (scope !== 'sent' && scope !== 'project') return null
+          if (groupMode !== 'project' || (scope !== 'sent' && scope !== 'project')) return null
           const projects = new Map()
           for (const file of visibleFiles) {
             const projectPath = file.cwd || inventoryCwd || file.projectName || ''
@@ -847,7 +851,23 @@ window.__ModuleLoader__.load({
             project.files += 1
           }
           return [...projects.values()].map(project => ({ ...project, sessions: [...project.sessions.values()] }))
-        }, [visibleFiles, scope, inventoryCwd, inventorySessionId, sessionTitle, t])
+        }, [visibleFiles, scope, inventoryCwd, inventorySessionId, sessionTitle, t, groupMode])
+
+        const categoryGroups = useMemo(() => {
+          if (groupMode !== 'category' || category !== 'all') return null
+          const groups = new Map()
+          for (const file of visibleFiles) {
+            const key = file.category || 'other'
+            let group = groups.get(key)
+            if (group === undefined) {
+              group = { key, files: [], filesCount: 0 }
+              groups.set(key, group)
+            }
+            group.files.push(file)
+            group.filesCount += 1
+          }
+          return [...groups.values()]
+        }, [visibleFiles, category, groupMode])
 
         const selectedFiles = useMemo(
           () => baseFiles.filter(file => selected.has(fileRowKey(file))),
@@ -1093,6 +1113,10 @@ window.__ModuleLoader__.load({
                 setContextMenu(null)
                 return
               }
+              if (traceFile !== null) {
+                setTraceFile(null)
+                return
+              }
               setViewer(null)
             } else if (event.key === 'ArrowLeft') {
               event.preventDefault()
@@ -1106,7 +1130,7 @@ window.__ModuleLoader__.load({
           }
           window.addEventListener('keydown', onKey)
           return () => window.removeEventListener('keydown', onKey)
-        }, [viewer, moveViewer, goViewerPage, viewerState.status, contextMenu])
+        }, [viewer, moveViewer, goViewerPage, viewerState.status, contextMenu, traceFile])
 
         const loadApps = useCallback(async (file) => {
           if (!file || typeof file.path !== 'string') return
@@ -1431,6 +1455,38 @@ window.__ModuleLoader__.load({
             }, t(label))))
         }
 
+        function renderContextBar() {
+          if (scope === 'history' && historyId === null) return null
+          const project = scope === 'sent'
+            ? t('context.allProjects')
+            : (inventoryCwd ? baseName(inventoryCwd) : t('context.noProject'))
+          return h('div', { className: 'dfl-context-bar' },
+            h('span', { className: 'dfl-context-label' }, t('context.isolation')),
+            h('span', { className: 'dfl-context-scope' }, t(scope === 'session' ? 'scope.session' : scope === 'sent' ? 'scope.sent' : scope === 'project' ? 'scope.project' : scope === 'pins' ? 'scope.pins' : 'scope.history')),
+            h('span', { className: 'dfl-context-title', title: inventoryCwd || inventoryTitle }, inventoryTitle),
+            h('span', { className: 'dfl-context-count' }, baseFiles.length),
+            h('span', { className: 'dfl-context-project', title: project }, `${t('context.project')}: ${project}`))
+        }
+
+        function renderCategoryTabs() {
+          if (scope === 'history' && historyId === null) return null
+          if (baseFiles.length === 0) return null
+          return h('div', { className: 'dfl-category-tabs', role: 'tablist', 'aria-label': t('filter.allFiles') },
+            categories.map(key => h('button', {
+              key,
+              type: 'button',
+              role: 'tab',
+              className: `dfl-category-tab${category === key ? ' is-active' : ''}`,
+              'aria-selected': category === key,
+              onClick: () => {
+                setCategory(key)
+                setFilterMenu(null)
+              },
+            },
+            h('span', { className: 'dfl-category-tab-label' }, key === 'all' ? t('filter.allFiles') : t(CATEGORY_LABELS[key])),
+            h('span', { className: 'dfl-category-tab-count' }, key === 'all' ? categoryCounts.total : categoryCounts.counts[key] || 0))))
+        }
+
         function renderHeader() {
           return h('div', { className: 'dfl-head' },
             h('div', { className: 'dfl-title-row' },
@@ -1539,6 +1595,11 @@ window.__ModuleLoader__.load({
               h('option', { value: 'time' }, t('sort.time')),
               h('option', { value: 'name' }, t('sort.name')),
               h('option', { value: 'type' }, t('sort.type'))),
+              scope === 'history' && historyId === null ? null : h('button', {
+                type: 'button', className: 'dfl-group-toggle',
+                title: groupMode === 'category' ? t('group.byProject') : t('group.byCategory'),
+                onClick: () => setGroupMode(value => value === 'category' ? 'project' : 'category'),
+              }, groupMode === 'category' ? t('group.byCategory') : t('group.byProject')),
             ),
             showFilters ? h('div', { className: 'dfl-filterbar' },
               h('button', {
@@ -1713,6 +1774,14 @@ window.__ModuleLoader__.load({
                 file.missing === true ? h('span', { className: 'dfl-badge is-missing' }, t('source.missing')) : null,
                 file.moved === true ? h('span', { className: 'dfl-badge is-moved' }, t('source.moved')) : null,
                 file.source === 'attachment' ? h('span', { className: 'dfl-badge is-user' }, t('source.attachment')) : null,
+                file.reference === true ? h('span', {
+                  className: 'dfl-badge is-reference',
+                  title: t('reference.trace'),
+                  onClick: event => {
+                    event.stopPropagation()
+                    setTraceFile(file)
+                  },
+                }, t('reference.badge')) : null,
                 file.archived === true ? h('span', { className: 'dfl-badge is-archived' }, t('source.archived')) : null,
                 pinned ? h('span', { className: 'dfl-badge is-pinned' }, t('source.pinned')) : null),
               h('div', { className: 'dfl-meta' },
@@ -1753,6 +1822,28 @@ window.__ModuleLoader__.load({
               h('p', { className: 'dfl-empty-text' }, t(key)))
           }
           const forceOpenGroups = query.trim().length > 0 || category !== 'all' || sourceFilter !== 'all' || archivedOnly
+          if (categoryGroups !== null) {
+            return h('div', { className: 'dfl-list dfl-grouped-list' }, categoryGroups.map(group => {
+              const key = group.key
+              const open = forceOpenGroups || expandedCategories.has(key)
+              return h('div', { key, className: 'dfl-category-group' },
+                h('button', {
+                  type: 'button',
+                  className: 'dfl-category-group-head',
+                  'aria-expanded': open,
+                  onClick: () => setExpandedCategories(previous => {
+                    const next = new Set(previous)
+                    if (next.has(key)) next.delete(key)
+                    else next.add(key)
+                    return next
+                  }),
+                },
+                h('span', { className: 'dfl-group-chevron', 'aria-hidden': true }, open ? '▾' : '▸'),
+                h('span', { className: 'dfl-group-name' }, t(CATEGORY_LABELS[key] || 'filter.other')),
+                h('span', { className: 'dfl-group-count' }, `${group.files.length}`)),
+                open ? group.files.map(renderRow) : null)
+            }))
+          }
           if (fileGroups !== null) {
             const renderSessionGroup = (projectKey, session, singleSession) => {
               const sessionKey = `${projectKey}:session:${session.key}`
@@ -2045,6 +2136,7 @@ window.__ModuleLoader__.load({
             item('copyRef', t('menu.copyRef'), () => copyReference([file])),
             !isFolder && !isMissing && isImageFile(file) ? item('copyImage', t('menu.copyImage'), () => copyImageFile(file)) : null,
             item('copyAttach', t('menu.attach'), () => insertReferences([file], { absolute: true })),
+            file.reference === true ? item('trace', t('menu.trace'), () => setTraceFile(file)) : null,
             !isFolder && !isMissing ? item('pin', pinned ? t('menu.unpin') : t('menu.pin'), () => pinned ? removePins([file]) : addPins([file])) : null,
             !isFolder && !isMissing ? item('archive', t('menu.archive'), () => archiveFiles([file])) : null,
           ].filter(Boolean)
@@ -2115,9 +2207,40 @@ window.__ModuleLoader__.load({
           )), document.body)
         }
 
+        function renderTrace() {
+          if (traceFile === null) return null
+          const origin = traceFile.referenceOrigin || {}
+          const rows = [
+            [t('trace.session'), traceFile.sessionTitle || origin.sessionId || sessionId],
+            [t('trace.project'), traceFile.projectName || origin.cwd || ''],
+            [t('trace.time'), origin.at === undefined ? '' : formatTime(origin.at)],
+            [t('trace.messageSeq'), origin.messageSeq === undefined ? '' : String(origin.messageSeq)],
+            [t('trace.excerpt'), origin.excerpt || ''],
+          ].filter(([, value]) => value !== '')
+          return ReactDOM.createPortal(h('div', {
+            className: 'dfl-confirm-modal dfl-theme',
+            ...themeAttributes(preferences, scheme),
+            onMouseDown: event => { if (event.target === event.currentTarget) setTraceFile(null) },
+          },
+          h('div', { className: 'dfl-confirm-card dfl-trace-card', role: 'dialog', 'aria-modal': true, 'aria-label': t('trace.title') },
+            h('div', { className: 'dfl-confirm-title' }, t('trace.title')),
+            h('div', { className: 'dfl-confirm-name', title: traceFile.path }, traceFile.name),
+            h('div', { className: 'dfl-trace-path', title: traceFile.path }, traceFile.path),
+            h('div', { className: 'dfl-trace-grid' }, rows.map(([label, value]) =>
+              h('div', { key: label, className: 'dfl-trace-row' },
+                h('span', null, label),
+                h('code', { title: value }, value)))),
+            h('div', { className: 'dfl-confirm-actions' },
+              h('button', { type: 'button', className: 'dfl-button', onClick: () => void copyText(traceFile.path).then(ok => notify(ok ? t('toast.copied') : t('toast.copyFailed'))) }, t('menu.copyPath')),
+              h('button', { type: 'button', className: 'dfl-button', onClick: () => setTraceFile(null) }, t('trace.close')))),
+          ), document.body)
+        }
+
         return h('div', { className: 'dfl-root dfl-theme', ...themeAttributes(preferences, scheme) },
           renderHeader(),
+          renderContextBar(),
           renderScopeTabs(),
+          renderCategoryTabs(),
           renderToolbar(),
           renderSelectionBar(),
           h('div', { className: 'dfl-body' }, renderBody()),
@@ -2126,7 +2249,8 @@ window.__ModuleLoader__.load({
           toast !== null ? h('div', { className: 'dfl-toast', role: 'status' }, toast.text) : null,
           renderViewer(),
           renderContextMenu(),
-          renderDeleteConfirm())
+          renderDeleteConfirm(),
+          renderTrace())
       }
     }
 
@@ -2554,6 +2678,13 @@ window.__ModuleLoader__.load({
       'filter.within': '在「{value}」内',
       'filter.typeLabel': '类型',
       'filter.typeAll': '全部类型',
+      'filter.allFiles': '全部文件',
+      'context.isolation': '隔离范围',
+      'context.project': '项目',
+      'context.allProjects': '所有项目',
+      'context.noProject': '无项目',
+      'group.byCategory': '按类型',
+      'group.byProject': '按项目',
       'filter.byType': '按类型筛选',
       'filter.bySource': '按来源筛选',
       'filter.clear': '清除筛选',
@@ -2590,6 +2721,16 @@ window.__ModuleLoader__.load({
       'source.missing': '不存在',
       'source.moved': '已移动',
       'source.missingHint': '原路径不存在，文件可能已删除或移动到其他磁盘。',
+      'reference.badge': '引用',
+      'reference.trace': '查看引用来源',
+      'menu.trace': '追溯引用位置',
+      'trace.title': '引用来源',
+      'trace.session': '来源会话',
+      'trace.project': '项目',
+      'trace.time': '引用时间',
+      'trace.messageSeq': '消息位置',
+      'trace.excerpt': '原始内容',
+      'trace.close': '关闭',
       'toast.missing': '文件不存在，可能已删除或移动',
       'source.read': '参考',
       'source.workspace': '工作区',
@@ -2760,6 +2901,13 @@ window.__ModuleLoader__.load({
       'filter.within': 'within {value}',
       'filter.typeLabel': 'Type',
       'filter.typeAll': 'All types',
+      'filter.allFiles': 'All files',
+      'context.isolation': 'Isolated to',
+      'context.project': 'Project',
+      'context.allProjects': 'All projects',
+      'context.noProject': 'No project',
+      'group.byCategory': 'By type',
+      'group.byProject': 'By project',
       'filter.byType': 'Filter by type',
       'filter.bySource': 'Filter by source',
       'filter.clear': 'Clear filters',
@@ -2796,6 +2944,16 @@ window.__ModuleLoader__.load({
       'source.missing': 'Missing',
       'source.moved': 'Moved',
       'source.missingHint': 'The original path no longer exists; the file may have been deleted or moved to another drive.',
+      'reference.badge': 'Reference',
+      'reference.trace': 'Show reference origin',
+      'menu.trace': 'Trace reference origin',
+      'trace.title': 'Reference origin',
+      'trace.session': 'Source conversation',
+      'trace.project': 'Project',
+      'trace.time': 'Referenced at',
+      'trace.messageSeq': 'Message position',
+      'trace.excerpt': 'Original text',
+      'trace.close': 'Close',
       'toast.missing': 'File not found; it may have been deleted or moved',
       'source.read': 'Read',
       'source.workspace': 'Workspace',
@@ -2924,6 +3082,49 @@ window.__ModuleLoader__.load({
 .dfl-subtitle { margin-top: 3px; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .dfl-subtitle-title { font-size: 12px; color: var(--dsw-alias-label-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dfl-subtitle-path { font-size: 11px; color: var(--dsw-alias-label-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
+.dfl-context-bar {
+  display: flex; align-items: center; gap: 6px; min-width: 0; margin: 1px 12px 0; padding: 6px 8px;
+  border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px; background: var(--dsw-alias-bg-layer-1);
+  font-size: 11px; color: var(--dsw-alias-label-tertiary); flex: none;
+}
+.dfl-context-label { flex: none; }
+.dfl-context-scope { flex: none; color: var(--dsw-alias-label-secondary); font-weight: 500; }
+.dfl-context-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-primary); }
+.dfl-context-count {
+  flex: none; min-width: 18px; height: 17px; padding: 0 5px; border-radius: 9px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-secondary); font-size: 10px;
+}
+.dfl-context-project { margin-left: auto; flex: none; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dfl-category-tabs {
+  display: flex; gap: 4px; padding: 6px 12px 7px; overflow-x: auto; flex: none;
+  border-bottom: 0.5px solid var(--dsw-alias-border-l3); scrollbar-width: none;
+}
+.dfl-category-tabs::-webkit-scrollbar { display: none; }
+.dfl-category-tab {
+  display: inline-flex; align-items: center; gap: 5px; flex: none; height: 26px; padding: 0 9px;
+  border: 0.5px solid transparent; border-radius: 7px; background: transparent;
+  color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px; cursor: pointer; white-space: nowrap;
+}
+.dfl-category-tab:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.dfl-category-tab.is-active {
+  background: var(--dsw-alias-bg-layer-1); border-color: var(--dsw-alias-border-l3);
+  color: var(--dsw-alias-label-primary); font-weight: 500;
+}
+.dfl-category-tab-count { color: var(--dsw-alias-label-tertiary); font-size: 10px; }
+.dfl-group-toggle {
+  height: 30px; flex: none; padding: 0 9px; border-radius: 8px; border: 0.5px solid var(--dsw-alias-border-l3);
+  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px;
+  cursor: pointer; white-space: nowrap;
+}
+.dfl-group-toggle:hover { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); }
+.dfl-category-group { margin: 0 0 5px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 9px; overflow: hidden; background: var(--dsw-alias-bg-layer-1); }
+.dfl-category-group-head {
+  width: 100%; min-height: 34px; padding: 0 10px; border: 0; display: flex; align-items: center; gap: 6px;
+  background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; cursor: pointer; text-align: left;
+}
+.dfl-category-group-head:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.dfl-category-group-head .dfl-group-count { margin-left: auto; }
 .dfl-scopes { display: flex; gap: 4px; padding: 8px 12px 7px; overflow-x: auto; flex: none; scrollbar-width: none; }
 .dfl-scopes::-webkit-scrollbar { display: none; }
 .dfl-scope {
@@ -3105,11 +3306,18 @@ window.__ModuleLoader__.load({
 .dfl-badge.is-delivered { color: #2f855a; border-color: color-mix(in srgb, #2f855a 35%, transparent); }
 .dfl-badge.is-pinned { color: #b7791f; border-color: color-mix(in srgb, #b7791f 40%, transparent); }
 .dfl-badge.is-user { color: #2b6cb0; border-color: color-mix(in srgb, #2b6cb0 35%, transparent); }
+.dfl-badge.is-reference { color: #0f766e; border-color: color-mix(in srgb, #0f766e 35%, transparent); cursor: pointer; }
 .dfl-badge.is-archived { color: #6b46c1; border-color: color-mix(in srgb, #6b46c1 35%, transparent); }
 .dfl-badge.is-folder { color: var(--dsw-alias-label-secondary); border-color: var(--dsw-alias-border-l3); }
 .dfl-badge.is-missing { color: var(--dsw-alias-state-error-primary); border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 35%, transparent); }
 .dfl-badge.is-moved { color: var(--dsw-alias-state-warning-primary); border-color: color-mix(in srgb, var(--dsw-alias-state-warning-primary) 35%, transparent); }
 .dfl-row.is-missing { opacity: 0.72; }
+.dfl-trace-card { width: min(560px, calc(100vw - 32px)); }
+.dfl-trace-path { margin-top: 6px; color: var(--dsw-alias-label-tertiary); font-size: 11px; word-break: break-all; }
+.dfl-trace-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.dfl-trace-row { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 11px; }
+.dfl-trace-row > span { color: var(--dsw-alias-label-tertiary); }
+.dfl-trace-row > code { color: var(--dsw-alias-label-secondary); word-break: break-all; white-space: pre-wrap; max-height: 96px; overflow: auto; }
 .dfl-meta { display: flex; align-items: baseline; gap: 0; min-width: 0; color: var(--dsw-alias-label-tertiary); font-size: 10.5px; }
 .dfl-meta-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .dfl-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dsw-alias-label-caption); }

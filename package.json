@@ -1,6 +1,6 @@
 {
   "name": "dsh-file-launcher",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "A right-sidebar file launcher for DeepSeek Harness: live-refreshing inventory grouped by project and conversation; master-detail source and type filters; PDF/Office/image/text previews; missing-file markers and deletion tombstones; workspace file resolution, composer attachments and @ references; pin paths against context compaction; copy files to an archive folder.",
   "license": "MIT",
   "type": "module",
