@@ -74,6 +74,7 @@ for (const optionalService of ['remote.officeKit', 'fileDrag']) {
 
 const registrations = []
 const disposers = []
+const injections = []
 const fakeContext = {
   effect(callback) {
     const cleanup = callback()
@@ -82,6 +83,10 @@ const fakeContext = {
   },
   locale: { bind() { return key => key }, register() {} },
   sidebarRightTabs: { register() {} },
+  inject(dependencies, callback) {
+    injections.push(dependencies)
+    callback({ remote: { officeKit: { render() {} } } })
+  },
   slots: {
     inject(name, callback) { callback(); return () => {} },
     register(options, component) {
@@ -95,6 +100,7 @@ const fakeContext = {
   },
 }
 module.apply(fakeContext)
+assert.ok(injections.some(dependencies => dependencies.includes('remote.officeKit')), 'officeKit must be optionally injected')
 for (const cleanup of disposers) cleanup()
 
 const throwContext = {

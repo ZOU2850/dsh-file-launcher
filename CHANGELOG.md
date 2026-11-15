@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.2
+
+### Fixed
+
+- **Office previews were unavailable**: `remote.officeKit` is now loaded through an optional `ctx.inject(['remote', 'remote.officeKit'])` holder instead of being required in the top-level injection list. Word, PowerPoint and Excel can convert again on standard profiles; profiles without office-kit still load the rest of the plugin and show the existing unavailable message.
+- Theme and Sidebar synchronization from 1.4.1 remain in place.
+
 ## 1.4.1
 
 ### Fixed

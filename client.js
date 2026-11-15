@@ -433,7 +433,7 @@ window.__ModuleLoader__.load({
      * @param ctx - client plugin context carrying the Remote and Sidebar services.
      * @returns the tab body component.
      */
-    function createPanel(ctx) {
+    function createPanel(ctx, officeKitRef) {
       return function FileLauncherPanel(props) {
         const { sessionId, useSessions, useTabInfo, inputActions, t } = props
         const { tab, panel } = useTabInfo()
@@ -1010,7 +1010,7 @@ window.__ModuleLoader__.load({
           void (async () => {
             try {
               if (isOfficeFile(file)) {
-                const officeKit = ctx.remote && ctx.remote.officeKit
+                const officeKit = officeKitRef?.value || (ctx.remote && ctx.remote.officeKit)
                 if (officeKit === undefined) throw new Error(t('viewer.officeUnavailable'))
                 const result = await officeKit.render(sourceSession, file.path, 'foreground', controller.signal)
                 controller.signal.throwIfAborted()
@@ -2356,7 +2356,15 @@ window.__ModuleLoader__.load({
     /** Browser plugin body. */
     function apply(ctx) {
       const t = ctx.locale.bind(NS)
-      const Panel = createPanel(ctx)
+      const officeKitRef = { value: undefined }
+      // Load the optional Office converter lazily: profiles without office-kit
+      // keep the rest of the plugin working, while standard Desktop/Web
+      // profiles expose remote.officeKit here.
+      ctx.inject?.(['remote', 'remote.officeKit'], scope => {
+        officeKitRef.value = scope.remote.officeKit
+        return () => { officeKitRef.value = undefined }
+      })
+      const Panel = createPanel(ctx, officeKitRef)
       const Title = createTitle(t)
       const HeaderEntry = createHeaderEntry(ctx, t)
       const ComposerEntry = createComposerEntry(ctx, t)
