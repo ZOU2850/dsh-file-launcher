@@ -25,6 +25,12 @@ window.__ModuleLoader__.load({
 
     /* ─────────────────────────── small helpers ─────────────────────────── */
 
+    const CATEGORY_ORDER = [
+      'document', 'slides', 'sheets', 'pdf', 'markdown', 'image', 'text', 'web',
+      'code', 'media', 'archive', 'design', 'database', 'font', 'executable',
+      'disk', 'binary', 'folder', 'other',
+    ]
+
     const CATEGORY_LABELS = {
       all: 'filter.all',
       document: 'filter.document',
@@ -48,11 +54,14 @@ window.__ModuleLoader__.load({
       other: 'filter.other',
     }
 
+    const SOURCE_ORDER = ['all', 'delivered', 'written', 'edited', 'attachment', 'reference', 'read', 'workspace', 'pinned']
+
     const SOURCE_LABELS = {
       delivered: 'source.delivered',
       written: 'source.written',
       edited: 'source.edited',
       attachment: 'source.attachment',
+      reference: 'source.reference',
       read: 'source.read',
       workspace: 'source.workspace',
       pinned: 'source.pinned',
@@ -61,32 +70,33 @@ window.__ModuleLoader__.load({
     const EXTENSION_CATEGORY = {
       doc: 'document', docx: 'document', odt: 'document', rtf: 'document', pages: 'document', wps: 'document',
       ppt: 'slides', pptx: 'slides', odp: 'slides', key: 'slides', dps: 'slides',
-      xls: 'sheets', xlsx: 'sheets', xlsm: 'sheets', csv: 'sheets', tsv: 'sheets', ods: 'sheets', et: 'sheets',
+      xls: 'sheets', xlsx: 'sheets', xlsm: 'sheets', csv: 'sheets', tsv: 'sheets', ods: 'sheets', numbers: 'sheets', et: 'sheets',
       pdf: 'pdf',
       md: 'markdown', markdown: 'markdown', mdx: 'markdown',
-      txt: 'text', log: 'text', json: 'text', jsonl: 'text', yaml: 'text', yml: 'text', toml: 'text',
-      ini: 'text', cfg: 'text', conf: 'text', xml: 'text', env: 'text',
+      txt: 'text', log: 'text', yaml: 'text', yml: 'text', toml: 'text',
+      ini: 'text', cfg: 'text', conf: 'text', xml: 'text', env: 'text', properties: 'text',
       png: 'image', jpg: 'image', jpeg: 'image', gif: 'image', webp: 'image', bmp: 'image', svg: 'image',
       ico: 'image', tif: 'image', tiff: 'image', avif: 'image',
-      html: 'web', htm: 'web', css: 'web', scss: 'web', less: 'web', vue: 'web', svelte: 'web', astro: 'web',
-      js: 'code', mjs: 'code', cjs: 'code', ts: 'code', tsx: 'code', jsx: 'code', py: 'code', ps1: 'code',
-      psm1: 'code', sh: 'code', bash: 'code', zsh: 'code', bat: 'code', cmd: 'code', java: 'code', kt: 'code',
-      kts: 'code', go: 'code', rs: 'code', c: 'code', h: 'code', cc: 'code', cpp: 'code', hpp: 'code',
+      html: 'web', htm: 'web', css: 'web', scss: 'web', sass: 'web', less: 'web', vue: 'web', svelte: 'web', astro: 'web',
+      js: 'code', mjs: 'code', cjs: 'code', ts: 'code', tsx: 'code', jsx: 'code', json: 'code', jsonc: 'code', jsonl: 'code',
+      py: 'code', ps1: 'code', psm1: 'code', sh: 'code', bash: 'code', zsh: 'code', bat: 'code', cmd: 'code',
+      java: 'code', kt: 'code', kts: 'code', go: 'code', rs: 'code', c: 'code', h: 'code', cc: 'code', cpp: 'code', cxx: 'code', hpp: 'code',
       cs: 'code', rb: 'code', php: 'code', swift: 'code', lua: 'code', r: 'code', scala: 'code', sql: 'code',
       dart: 'code', ex: 'code', exs: 'code', erl: 'code', hs: 'code', clj: 'code', gradle: 'code',
-      make: 'code', dockerfile: 'code',
+      make: 'code', dockerfile: 'code', graphql: 'code', gql: 'code', proto: 'code',
       mp4: 'media', mov: 'media', mkv: 'media', avi: 'media', webm: 'media', mp3: 'media', wav: 'media',
       flac: 'media', m4a: 'media', ogg: 'media', aac: 'media',
       zip: 'archive', '7z': 'archive', rar: 'archive', tar: 'archive', gz: 'archive', tgz: 'archive',
-      bz2: 'archive', xz: 'archive',
-      psd: 'design', ai: 'design', sketch: 'design', fig: 'design', xd: 'design', dwg: 'design', dxf: 'design',
+      bz2: 'archive', xz: 'archive', zst: 'archive',
+      psd: 'design', ai: 'design', eps: 'design', sketch: 'design', fig: 'design', xd: 'design', dwg: 'design', dxf: 'design',
       blend: 'design', obj: 'design', stl: 'design', '3ds': 'design', indd: 'design', afdesign: 'design',
       exe: 'executable', msi: 'executable', msix: 'executable', appx: 'executable', app: 'executable',
-      dmg: 'executable', deb: 'executable', rpm: 'executable', apk: 'executable',
-      db: 'database', sqlite: 'database', sqlite3: 'database', mdb: 'database', accdb: 'database', dbf: 'database',
+      dmg: 'executable', pkg: 'executable', deb: 'executable', rpm: 'executable', apk: 'executable', appimage: 'executable',
+      db: 'database', sqlite: 'database', sqlite3: 'database', mdb: 'database', accdb: 'database', dbf: 'database', parquet: 'database',
       ttf: 'font', otf: 'font', woff: 'font', woff2: 'font', eot: 'font',
       iso: 'disk', img: 'disk', vhd: 'disk', vhdx: 'disk', vmdk: 'disk',
       bin: 'binary', dat: 'binary', pak: 'binary', wasm: 'binary', dll: 'binary', so: 'binary', dylib: 'binary',
+      o: 'binary', a: 'binary', lib: 'binary', class: 'binary', pyc: 'binary',
     }
 
     /** Lowercase extension without the dot. */
@@ -97,9 +107,36 @@ window.__ModuleLoader__.load({
       return dot > 0 && dot < base.length - 1 ? base.slice(dot + 1).toLowerCase() : ''
     }
 
-    /** UI category of a file name or path. */
-    function categoryOf(name) {
-      return EXTENSION_CATEGORY[extensionOf(name)] || 'other'
+    /** UI category of a file name, path, or file row object. */
+    function categoryOf(nameOrItem, isFolder = false) {
+      if (isFolder === true) return 'folder'
+      if (nameOrItem && typeof nameOrItem === 'object') {
+        if (nameOrItem.isFolder === true) return 'folder'
+        return EXTENSION_CATEGORY[extensionOf(nameOrItem.name || nameOrItem.path || '')] || 'other'
+      }
+      return EXTENSION_CATEGORY[extensionOf(nameOrItem)] || 'other'
+    }
+
+    const DELIVERABLE_DOC_EXTENSIONS = new Set([
+      'docx', 'doc', 'odt', 'rtf', 'pages', 'wps',
+      'ppt', 'pptx', 'odp', 'key', 'dps',
+      'xls', 'xlsx', 'xlsm', 'csv', 'tsv', 'ods', 'numbers', 'et',
+      'pdf', 'md', 'mdx', 'markdown', 'txt', 'html', 'htm',
+    ])
+
+    function isReadableFile(file) {
+      if (!file) return false
+      if (file.isFolder === true || file.source === 'attachment' || file.source === 'delivered' || file.source === 'pinned') return true
+      const ext = extensionOf(file.name || file.path)
+      if (DELIVERABLE_DOC_EXTENSIONS.has(ext) || BROWSER_IMAGE_EXTENSIONS.has(ext) || ext === 'tif' || ext === 'tiff') return true
+      const cat = file.category || categoryOf(file)
+      return cat === 'media' || cat === 'archive' || cat === 'design'
+    }
+
+    function matchesSourceFilter(file, filter) {
+      if (!filter || filter === 'all') return true
+      if (filter === 'reference') return file?.reference === true
+      return file?.source === filter
     }
 
     /** Office formats the Host office-kit can convert to a PDF preview. */
@@ -377,10 +414,8 @@ window.__ModuleLoader__.load({
       if (typeof milliseconds !== 'number' || !Number.isFinite(milliseconds)) return ''
       const date = new Date(milliseconds)
       if (Number.isNaN(date.getTime())) return ''
-      const now = new Date()
-      const sameDay = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()
-      if (sameDay) return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-      return `${date.getMonth() + 1}-${date.getDate()}`
+      const pad = n => String(n).padStart(2, '0')
+      return `${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
     }
 
     /** Fetch one JSON route, surfacing the server's own error text. */
@@ -437,15 +472,126 @@ window.__ModuleLoader__.load({
         style: { display: 'block', flex: 'none' },
       },
       h('path', {
-        d: 'M3.5 6.5A2.5 2.5 0 0 1 6 4h3.2c.7 0 1.4.3 1.9.9l1 1.1H18a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 18 19H6a2.5 2.5 0 0 1-2.5-2.5v-10Z',
-        fill: 'currentColor', opacity: 0.9,
+        d: 'M4 6.5A2.5 2.5 0 0 1 6.5 4h2.9c.7 0 1.4.3 1.9.8l1 1.1H17.5A2.5 2.5 0 0 1 20 8.4v9.1a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5v-11Z',
+        fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinejoin: 'round',
       }),
       h('path', {
-        d: 'M9.2 13.1h5.6m-2.4-2.4 2.4 2.4-2.4 2.4',
-        fill: 'none', stroke: 'var(--dsw-alias-bg-base)', strokeWidth: 1.6,
+        d: 'M9 13.2h6m-2.5-2.5 2.5 2.5-2.5 2.5',
+        fill: 'none', stroke: 'currentColor', strokeWidth: 1.7,
         strokeLinecap: 'round', strokeLinejoin: 'round',
       }))
     }
+
+    /** Crisp 1.8px-stroke linear SVG primitives shared across the redesigned UI. */
+    function SvgIcon({ size = 13, viewBox = '0 0 24 24', className, strokeWidth = 1.8, children }) {
+      return h('svg', {
+        width: size, height: size, viewBox, fill: 'none',
+        stroke: 'currentColor', strokeWidth, strokeLinecap: 'round', strokeLinejoin: 'round',
+        'aria-hidden': true, className,
+        style: { display: 'block', flex: 'none' },
+      }, ...(Array.isArray(children) ? children : [children]))
+    }
+
+    const RefreshIcon = (size = 13) => SvgIcon({
+      size,
+      children: [
+        h('path', { key: 'a', d: 'M21 12a9 9 0 1 1-2.64-6.36' }),
+        h('polyline', { key: 'b', points: '21 3 21 9 15 9' }),
+      ],
+    })
+    const SearchIcon = (size = 13) => SvgIcon({
+      size,
+      className: 'dfl-search-icon',
+      children: [
+        h('circle', { key: 'a', cx: 11, cy: 11, r: 7 }),
+        h('line', { key: 'b', x1: 21, y1: 21, x2: 16.65, y2: 16.65 }),
+      ],
+    })
+    const CaretDownIcon = (size = 11) => SvgIcon({
+      size, strokeWidth: 2, className: 'dfl-svg-caret',
+      children: h('path', { d: 'm6 9 6 6 6-6' }),
+    })
+    const ChevronRightIcon = (size = 12, className = 'dfl-group-caret') => SvgIcon({
+      size, strokeWidth: 2, className,
+      children: h('path', { d: 'm9 6 6 6-6 6' }),
+    })
+    const ExternalArrowIcon = (size = 13) => SvgIcon({
+      size, strokeWidth: 1.9,
+      children: [
+        h('path', { key: 'a', d: 'M7 17 17 7' }),
+        h('path', { key: 'b', d: 'M9 7h8v8' }),
+      ],
+    })
+    const StarIcon = (filled = false, size = 13) => h('svg', {
+      width: size, height: size, viewBox: '0 0 24 24',
+      fill: filled ? 'currentColor' : 'none',
+      stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round',
+      'aria-hidden': true, style: { display: 'block', flex: 'none' },
+    }, h('polygon', { points: '12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' }))
+    const CheckIcon = (size = 11) => SvgIcon({
+      size, strokeWidth: 2.3,
+      children: h('polyline', { points: '20 6 9 17 4 12' }),
+    })
+    const FilterIcon = (size = 12) => SvgIcon({
+      size, strokeWidth: 1.8,
+      children: h('polygon', { points: '22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3' }),
+    })
+    const ArchiveIcon = (size = 12) => SvgIcon({
+      size, strokeWidth: 1.8,
+      children: [
+        h('polyline', { key: 'a', points: '21 8 21 21 3 21 3 8' }),
+        h('rect', { key: 'b', x: 1, y: 3, width: 22, height: 5, rx: 1 }),
+        h('line', { key: 'c', x1: 10, y1: 12, x2: 14, y2: 12 }),
+      ],
+    })
+    const FolderIcon = (size = 12) => SvgIcon({
+      size, strokeWidth: 1.8,
+      children: h('path', { d: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' }),
+    })
+    const GlobeIcon = (size = 12) => SvgIcon({
+      size, strokeWidth: 1.8,
+      children: [
+        h('circle', { key: 'a', cx: 12, cy: 12, r: 9 }),
+        h('line', { key: 'b', x1: 3, y1: 12, x2: 21, y2: 12 }),
+        h('path', { key: 'c', d: 'M12 3a14.5 14.5 0 0 1 0 18 14.5 14.5 0 0 1 0-18z' }),
+      ],
+    })
+    const ChatIcon = (size = 12) => SvgIcon({
+      size, strokeWidth: 1.8,
+      children: h('path', { d: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' }),
+    })
+    const BackIcon = (size = 13) => SvgIcon({
+      size, strokeWidth: 2,
+      children: h('path', { d: 'm15 18-6-6 6-6' }),
+    })
+    const CloseIcon = (size = 12) => SvgIcon({
+      size, strokeWidth: 2,
+      children: [
+        h('line', { key: 'a', x1: 18, y1: 6, x2: 6, y2: 18 }),
+        h('line', { key: 'b', x1: 6, y1: 6, x2: 18, y2: 18 }),
+      ],
+    })
+    const PrevIcon = (size = 13) => SvgIcon({ size, strokeWidth: 2, children: h('path', { d: 'm15 18-6-6 6-6' }) })
+    const NextIcon = (size = 13) => SvgIcon({ size, strokeWidth: 2, children: h('path', { d: 'm9 18 6-6-6-6' }) })
+    const PinBadgeIcon = (size = 10) => h('svg', {
+      width: size, height: size, viewBox: '0 0 24 24', fill: 'currentColor',
+      'aria-hidden': true, style: { display: 'block', flex: 'none' },
+    }, h('polygon', { points: '12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' }))
+    const RefLinkIcon = (size = 10) => SvgIcon({
+      size, strokeWidth: 2,
+      children: [
+        h('path', { key: 'a', d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' }),
+        h('path', { key: 'b', d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' }),
+      ],
+    })
+    const WarningIcon = (size = 15) => SvgIcon({
+      size, strokeWidth: 1.9,
+      children: [
+        h('path', { key: 'a', d: 'M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z' }),
+        h('line', { key: 'b', x1: 12, y1: 9, x2: 12, y2: 13 }),
+        h('line', { key: 'c', x1: 12, y1: 17, x2: 12.01, y2: 17 }),
+      ],
+    })
 
     /* ─────────────────────────── panel component ─────────────────────────── */
 
@@ -474,18 +620,23 @@ window.__ModuleLoader__.load({
 
         /* Panel state. */
         const [scope, setScope] = useState('session')
+        const [regionTarget, setRegionTarget] = useState({ kind: 'current-session' })
         const [preferences, setPreferences] = useState(null)
         const [traceFile, setTraceFile] = useState(null)
         const scheme = useResolvedScheme(preferences?.appearanceTheme || 'host')
         const scopeTouched = useRef(false)
-        const [historyId, setHistoryId] = useState(null)
         const [historySessions, setHistorySessions] = useState([])
         const [data, setData] = useState(null)
+        const [sentData, setSentData] = useState(null)
         const [pins, setPins] = useState([])
         const [pinsError, setPinsError] = useState('')
         const [health, setHealth] = useState(null)
         const [desktop, setDesktop] = useState(null)
         const [loading, setLoading] = useState(false)
+        const [loadElapsedMs, setLoadElapsedMs] = useState(0)
+        const loadingStartedAtRef = useRef(0)
+        const viewerStartedAtRef = useRef(0)
+        const scopeDurationRef = useRef({ session: 1200, sent: 3500, project: 1800, viewer: 2500 })
         const [error, setError] = useState('')
         const [query, setQuery] = useState('')
         const [category, setCategory] = useState('all')
@@ -495,6 +646,11 @@ window.__ModuleLoader__.load({
         const [contextMenu, setContextMenu] = useState(null)
         const [pendingDelete, setPendingDelete] = useState(null)
         const [filterMenu, setFilterMenu] = useState(null)
+        const [filterPos, setFilterPos] = useState({ left: 8, top: 120, width: 340 })
+        const [scopeMenuOpen, setScopeMenuOpen] = useState(false)
+        const [scopePos, setScopePos] = useState({ left: 10, top: 42, width: 320, maxHeight: 380 })
+        const scopeBtnRef = useRef(null)
+        const filterBtnRef = useRef(null)
         const contextMenuRef = useRef(null)
 
         useEffect(() => {
@@ -506,16 +662,72 @@ window.__ModuleLoader__.load({
         }, [contextMenu])
 
         useEffect(() => {
+          if (!scopeMenuOpen) return undefined
+          const updatePos = () => {
+            const btn = scopeBtnRef.current
+            const vw = window.innerWidth || 420
+            const vh = window.innerHeight || 720
+            const width = Math.max(240, Math.min(360, vw - 16))
+            if (!btn || typeof btn.getBoundingClientRect !== 'function') {
+              setScopePos({ left: 8, top: 42, width, maxHeight: Math.min(380, vh - 80) })
+              return
+            }
+            const rect = btn.getBoundingClientRect()
+            const left = Math.max(8, Math.min(rect.left, vw - width - 8))
+            const spaceBelow = vh - rect.bottom - 12
+            setScopePos({ left, top: Math.max(8, rect.bottom + 4), width: Math.max(rect.width, Math.min(360, vw - 16)), maxHeight: Math.max(180, Math.min(400, spaceBelow)) })
+          }
+          updatePos()
+          const dismiss = (event) => {
+            const target = event.target
+            if (target instanceof Element && (target.closest('.dfl-scope-dropdown') !== null || target.closest('.dfl-scope-trigger') !== null)) return
+            setScopeMenuOpen(false)
+          }
+          const onKey = (event) => { if (event.key === 'Escape') setScopeMenuOpen(false) }
+          window.addEventListener('resize', updatePos)
+          document.addEventListener('mousedown', dismiss)
+          document.addEventListener('keydown', onKey)
+          return () => {
+            window.removeEventListener('resize', updatePos)
+            document.removeEventListener('mousedown', dismiss)
+            document.removeEventListener('keydown', onKey)
+          }
+        }, [scopeMenuOpen])
+
+        useEffect(() => {
           if (filterMenu === null) return
+          const updatePos = () => {
+            const btn = filterBtnRef.current
+            const vw = window.innerWidth || 420
+            const vh = window.innerHeight || 720
+            const width = Math.max(240, Math.min(340, vw - 16))
+            if (!btn || typeof btn.getBoundingClientRect !== 'function') {
+              setFilterPos({ left: 8, top: 120, width, maxHeight: Math.min(360, vh - 140) })
+              return
+            }
+            const rect = btn.getBoundingClientRect()
+            const left = Math.max(8, Math.min(rect.left, vw - width - 8))
+            const spaceBelow = vh - rect.bottom - 12
+            const spaceAbove = rect.top - 12
+            const openUp = spaceBelow < 240 && spaceAbove > spaceBelow
+            const maxHeight = Math.max(180, Math.min(360, openUp ? spaceAbove : spaceBelow))
+            const top = openUp
+              ? Math.max(8, rect.top - Math.min(320, maxHeight) - 6)
+              : Math.max(8, rect.bottom + 6)
+            setFilterPos({ left, top, width, maxHeight })
+          }
+          updatePos()
           const dismiss = (event) => {
             const target = event.target
             if (target instanceof Element && (target.closest('.dfl-filter-popover') !== null || target.closest('.dfl-filter-trigger') !== null)) return
             setFilterMenu(null)
           }
           const onKey = (event) => { if (event.key === 'Escape') setFilterMenu(null) }
+          window.addEventListener('resize', updatePos)
           document.addEventListener('mousedown', dismiss)
           document.addEventListener('keydown', onKey)
           return () => {
+            window.removeEventListener('resize', updatePos)
             document.removeEventListener('mousedown', dismiss)
             document.removeEventListener('keydown', onKey)
           }
@@ -524,8 +736,21 @@ window.__ModuleLoader__.load({
         const [archivedOnly, setArchivedOnly] = useState(false)
         const [expandedProjects, setExpandedProjects] = useState(() => new Map())
         const [expandedSessions, setExpandedSessions] = useState(() => new Map())
-        const [expandedCategories, setExpandedCategories] = useState(() => new Set())
-        const [groupMode, setGroupMode] = useState('category')
+        const [collapsedCategories, setCollapsedCategories] = useState(() => new Set())
+        const [groupModeByTab, setGroupModeByTab] = useState(() => ({
+          session: 'category',
+          sent: 'project',
+          pins: 'project',
+          project: 'category',
+        }))
+        const groupMode = groupModeByTab[scope] || 'category'
+        const setGroupModeForActiveTab = useCallback((updater) => {
+          setGroupModeByTab(previous => {
+            const currentMode = previous[scope] || 'category'
+            const nextMode = typeof updater === 'function' ? updater(currentMode) : updater
+            return { ...previous, [scope]: nextMode }
+          })
+        }, [scope])
         const [viewer, setViewer] = useState(null)
         const [viewerState, setViewerState] = useState({ status: 'idle' })
         const viewerUrl = useRef(null)
@@ -541,20 +766,35 @@ window.__ModuleLoader__.load({
         const [, setAppRevision] = useState(0)
         const appCache = useRef({})
         const dataCache = useRef(new Map())
+        const [tabCounts, setTabCounts] = useState({})
 
-        const inventorySessionId = scope === 'history' ? historyId : sessionId
+        const historyId = regionTarget.kind === 'history-session' ? regionTarget.sessionId : null
+        const selectedHistoryProjectCwd = regionTarget.kind === 'history-project' ? regionTarget.cwd : undefined
+        const effectiveSessionId = regionTarget.kind === 'history-session'
+          ? regionTarget.sessionId
+          : regionTarget.kind === 'history-project' && regionTarget.repSessionId
+            ? regionTarget.repSessionId
+            : sessionId
         const historyRow = useMemo(() => {
-          if (historyId === null) return undefined
-          return sessions.find(row => row.id === historyId)
-            || historySessions.find(row => row.id === historyId)
-        }, [historyId, sessions, historySessions])
-        const inventoryCwd = scope === 'history'
-          ? (historyRow && historyRow.cwd ? historyRow.cwd : undefined)
-          : cwd
-        const inventoryTitle = scope === 'sent'
-          ? t('scope.sentTitle')
-          : scope === 'history' && historyRow
-            ? (historyRow.displayTitle || historyRow.title || historyId)
+          const targetId = regionTarget.kind === 'history-session'
+            ? regionTarget.sessionId
+            : regionTarget.kind === 'history-project'
+              ? regionTarget.repSessionId
+              : null
+          if (!targetId) return undefined
+          return sessions.find(row => row.id === targetId)
+            || historySessions.find(row => row.id === targetId)
+        }, [regionTarget, sessions, historySessions])
+        const inventorySessionId = effectiveSessionId
+        const inventoryCwd = regionTarget.kind === 'history-project'
+          ? (selectedHistoryProjectCwd || historyRow?.cwd)
+          : regionTarget.kind === 'history-session'
+            ? (regionTarget.cwd || (historyRow && historyRow.cwd ? historyRow.cwd : undefined))
+            : cwd
+        const inventoryTitle = regionTarget.kind === 'history-session'
+          ? (regionTarget.title || (historyRow && (historyRow.displayTitle || historyRow.title)) || regionTarget.sessionId)
+          : regionTarget.kind === 'history-project'
+            ? (regionTarget.name || (inventoryCwd ? baseName(inventoryCwd) : t('group.unknown')))
             : sessionTitle
         const inventoryScope = scope === 'project' ? 'project' : scope === 'sent' ? 'sent' : 'session'
 
@@ -591,19 +831,51 @@ window.__ModuleLoader__.load({
 
         useEffect(() => { void loadPins() }, [loadPins])
 
-        /* Host session fallback for the history chooser. */
+        /* Load historical conversations on demand when the top Scope menu opens or when browsing Sent/Project tabs. */
         useEffect(() => {
-          if (scope !== 'history' || sessions.length > 0) return undefined
+          if ((!scopeMenuOpen && scope !== 'sent' && scope !== 'project') || historySessions.length > 0) return undefined
           let alive = true
           api('/api/file-launcher.sessions?limit=60')
             .then(value => { if (alive && Array.isArray(value.sessions)) setHistorySessions(value.sessions) })
             .catch(() => {})
           return () => { alive = false }
-        }, [scope, sessions.length])
+        }, [scopeMenuOpen, scope, historySessions.length])
 
-        /* Inventory for the current conversation, project, or chosen history row. */
+        /* Keep sent inventory loaded for Sent-tab isolation & dropdown counts after project prefetch and first paint. */
         useEffect(() => {
-          if (scope === 'pins' || scope === 'history' && historyId === null) {
+          if (typeof sessionId !== 'string' || sessionId.length === 0) {
+            setSentData(null)
+            return undefined
+          }
+          if (scope !== 'sent' && !scopeMenuOpen && sentData !== null && refreshKey === 0) return undefined
+          if (scope !== 'sent' && !scopeMenuOpen && (data === null || loading)) return undefined
+          let alive = true
+          const controller = new AbortController()
+          const delayMs = scope === 'sent' || scopeMenuOpen ? 0 : 800
+          const timer = setTimeout(() => {
+            if (!alive) return
+            const parameters = new URLSearchParams({
+              sessionId,
+              scope: 'sent',
+              limit: String(preferences?.maxRows || 1000),
+            })
+            if (refreshKey > 0) parameters.set('fresh', '1')
+            api(`/api/file-launcher.inventory?${parameters.toString()}`, { signal: controller.signal })
+              .then(value => {
+                if (!alive) return
+                if (value && typeof value.durationMs === 'number' && value.durationMs > 0) {
+                  scopeDurationRef.current.sent = value.durationMs
+                }
+                setSentData(value)
+              })
+              .catch(() => {})
+          }, delayMs)
+          return () => { alive = false; clearTimeout(timer); controller.abort() }
+        }, [sessionId, scope, scopeMenuOpen, refreshKey, liveTick, preferences?.maxRows, data, loading])
+
+        /* Inventory for the current conversation, project, or selected history conversation. */
+        useEffect(() => {
+          if (scope === 'pins') {
             setLoading(false)
             return undefined
           }
@@ -620,8 +892,9 @@ window.__ModuleLoader__.load({
           prevRefreshKeyRef.current = refreshKey
           const live = sameView && !manual && prevLiveTickRef.current !== liveTick
           prevLiveTickRef.current = liveTick
+          const cacheTtlMs = inventoryScope === 'project' ? 45_000 : 30_000
           const cached = dataCache.current.get(cacheKey)
-          if (!live && cached !== undefined && Date.now() - cached.at < 30_000) {
+          if (!live && cached !== undefined && Date.now() - cached.at < cacheTtlMs) {
             setData(cached.value)
             setError('')
             setLoading(false)
@@ -629,6 +902,9 @@ window.__ModuleLoader__.load({
           }
           let alive = true
           const controller = new AbortController()
+          const requestStartedAt = Date.now()
+          loadingStartedAtRef.current = requestStartedAt
+          setLoadElapsedMs(0)
           setLoading(true)
           setError('')
           const parameters = new URLSearchParams({
@@ -643,6 +919,10 @@ window.__ModuleLoader__.load({
           api(`/api/file-launcher.inventory?${parameters.toString()}`, { signal: controller.signal })
             .then(value => {
               if (!alive) return
+              const measuredMs = typeof value?.durationMs === 'number' && value.durationMs > 0
+                ? value.durationMs
+                : Date.now() - requestStartedAt
+              if (measuredMs > 0) scopeDurationRef.current[inventoryScope] = measuredMs
               dataCache.current.set(cacheKey, { at: Date.now(), value })
               // Bound the cache: each entry holds a full inventory payload.
               while (dataCache.current.size > 24) {
@@ -650,6 +930,11 @@ window.__ModuleLoader__.load({
                 dataCache.current.delete(oldest)
               }
               setData(value)
+              if (inventoryScope === 'sent') setSentData(value)
+              if (inventoryScope === 'project' && inventorySessionId === sessionId && value && Array.isArray(value.files)) {
+                const pKey = `${sessionId}:project`
+                setTabCounts(prev => prev[pKey] === value.files.length ? prev : { ...prev, [pKey]: value.files.length })
+              }
               if (!live) setSelected(new Set())
             })
             .catch(caught => {
@@ -659,7 +944,49 @@ window.__ModuleLoader__.load({
             })
             .finally(() => { if (alive) setLoading(false) })
           return () => { alive = false; controller.abort() }
-        }, [scope, historyId, inventorySessionId, inventoryScope, refreshKey, liveTick, preferences?.maxRows])
+        }, [scope, regionTarget, inventorySessionId, inventoryScope, refreshKey, liveTick, preferences?.maxRows])
+
+        /* Prefetch current-project inventory early after foreground load settles so switching tabs is instant. */
+        useEffect(() => {
+          if (typeof sessionId !== 'string' || sessionId.length === 0) return undefined
+          if (scope === 'project' || data === null || loading) return undefined
+          const key = `${sessionId}:project`
+          if (tabCounts[key] !== undefined) return undefined
+          let alive = true
+          const controller = new AbortController()
+          const maxRowsVal = String(preferences?.maxRows || 800)
+          const pCacheKey = `project:${sessionId}:${refreshKey}:${maxRowsVal}`
+          const timer = setTimeout(() => {
+            if (!alive) return
+            const t0 = Date.now()
+            api(`/api/file-launcher.inventory?${new URLSearchParams({ sessionId, scope: 'project', limit: maxRowsVal }).toString()}`, { signal: controller.signal })
+              .then(value => {
+                if (!alive || !value || !Array.isArray(value.files)) return
+                const ms = typeof value.durationMs === 'number' && value.durationMs > 0 ? value.durationMs : Date.now() - t0
+                scopeDurationRef.current.project = ms
+                dataCache.current.set(pCacheKey, { at: Date.now(), value })
+                while (dataCache.current.size > 24) {
+                  const oldest = dataCache.current.keys().next().value
+                  dataCache.current.delete(oldest)
+                }
+                setTabCounts(prev => prev[key] === value.files.length ? prev : { ...prev, [key]: value.files.length })
+              })
+              .catch(() => {})
+          }, 180)
+          return () => { alive = false; clearTimeout(timer); controller.abort() }
+        }, [sessionId, scope, data, loading, refreshKey, preferences?.maxRows])
+
+        /* Tick elapsed time smoothly only while a loading card or preview loader is active on screen. */
+        useEffect(() => {
+          const isListLoading = loading && scope !== 'pins'
+          const isViewerLoading = viewerState.status === 'loading'
+          if (!isListLoading && !isViewerLoading) return undefined
+          const timer = setInterval(() => {
+            const origin = isViewerLoading ? viewerStartedAtRef.current : loadingStartedAtRef.current
+            if (origin > 0) setLoadElapsedMs(Math.max(0, Date.now() - origin))
+          }, 250)
+          return () => clearInterval(timer)
+        }, [loading, scope, viewerState.status])
 
         useEffect(() => {
           applyDocumentTheme(preferences)
@@ -697,14 +1024,14 @@ window.__ModuleLoader__.load({
 
         useEffect(() => {
           if (viewer !== null) return undefined
-          if (scope === 'pins' || (scope === 'history' && historyId === null)) return undefined
+          if (scope === 'pins') return undefined
           const seconds = preferences && preferences.autoRefresh === false ? 0 : preferences ? preferences.refreshSeconds : 60
           if (seconds <= 0) return undefined
           const timer = setInterval(() => {
             setLiveTick(value => value + 1)
           }, seconds * 1000)
           return () => clearInterval(timer)
-        }, [scope, historyId, viewer, preferences])
+        }, [scope, regionTarget, viewer, preferences])
 
         /* Toast lifetime. */
         useEffect(() => {
@@ -715,8 +1042,9 @@ window.__ModuleLoader__.load({
 
         /* Reset the drill-down when the Session changes. */
         useEffect(() => {
-          setHistoryId(null)
+          setRegionTarget({ kind: 'current-session' })
           setData(null)
+          setSentData(null)
           setSelected(new Set())
           setViewer(null)
           setViewerState({ status: 'idle' })
@@ -724,51 +1052,127 @@ window.__ModuleLoader__.load({
           setPendingDelete(null)
           setTraceFile(null)
           setFilterMenu(null)
+          setScopeMenuOpen(false)
         }, [sessionId])
 
         /* Pin lookup. */
         const pinKeys = useMemo(() => new Set(pins.map(pin => pathKey(pin.path))), [pins])
 
-        /* The panel's raw rows. */
-        const pinRows = useMemo(() => pins.map(pin => {
-          const name = pin.name || baseName(pin.path)
-          const rowCwd = pin.cwd || cwd
-          return {
-            path: pin.path,
-            name,
-            rel: relativeOf(pin.path, rowCwd),
-            category: categoryOf(name || pin.path),
-            source: 'pinned',
-            description: pin.description,
-            sessionId: pin.sessionId,
-            cwd: pin.cwd || cwd,
-            mtime: pin.addedAt,
-            addedAt: pin.addedAt,
+        /* Region matcher shared by Sent and Pinned isolation. */
+        const matchesRegion = useCallback((file, target = regionTarget) => {
+          if (!file) return false
+          if (!target || target.kind === 'all') return true
+          if (target.kind === 'current-session') {
+            return file.sessionId ? file.sessionId === sessionId : false
           }
-        }), [pins, cwd])
+          if (target.kind === 'history-session') {
+            return file.sessionId === target.sessionId
+          }
+          if (target.kind === 'current-project') {
+            if (!cwd) return file.sessionId === sessionId
+            const targetKey = pathKey(cwd)
+            if (file.cwd) return pathKey(file.cwd) === targetKey
+            return file.path ? pathKey(file.path).startsWith(targetKey) : false
+          }
+          if (target.kind === 'history-project') {
+            if (target.cwd) {
+              const targetKey = pathKey(target.cwd)
+              if (file.cwd) return pathKey(file.cwd) === targetKey
+              return file.path ? pathKey(file.path).startsWith(targetKey) : false
+            }
+            return target.name ? (file.projectName || '') === target.name : false
+          }
+          return true
+        }, [regionTarget, sessionId, cwd])
+
+        /* The panel's raw rows. */
+        const pinRows = useMemo(() => {
+          const sessionTitleById = new Map(sessions.map(row => [row.id, row.displayTitle || row.title]))
+          for (const row of historySessions) {
+            if (row && row.id && !sessionTitleById.has(row.id) && row.title) sessionTitleById.set(row.id, row.title)
+          }
+          return pins.map(pin => {
+            const name = pin.name || baseName(pin.path)
+            const rowCwd = pin.cwd || ''
+            return {
+              path: pin.path,
+              name,
+              rel: relativeOf(pin.path, rowCwd || cwd),
+              category: categoryOf(name || pin.path),
+              source: 'pinned',
+              description: pin.description,
+              sessionId: pin.sessionId,
+              sessionTitle: pin.sessionId ? sessionTitleById.get(pin.sessionId) : undefined,
+              cwd: rowCwd,
+              projectName: rowCwd ? baseName(rowCwd) : undefined,
+              mtime: pin.addedAt,
+              addedAt: pin.addedAt,
+            }
+          })
+        }, [pins, sessions, historySessions, cwd])
+
+        const sentAllRows = useMemo(() => {
+          if (sentData && Array.isArray(sentData.files)) return sentData.files
+          if (data && data.scope === 'sent' && Array.isArray(data.files)) return data.files
+          return []
+        }, [sentData, data])
 
         const currentData = data && data.scope === inventoryScope
           && (inventoryScope === 'sent' || data.sessionId === inventorySessionId) ? data : null
-        const baseFiles = scope === 'pins' ? pinRows : (currentData ? currentData.files : [])
+
+        const baseFiles = useMemo(() => {
+          if (scope === 'pins') return pinRows.filter(row => matchesRegion(row, regionTarget))
+          if (scope === 'sent') return sentAllRows.filter(row => matchesRegion(row, regionTarget))
+          const rows = currentData ? currentData.files : []
+          // "本次产出" stays focused on AI outputs/reads of the conversation, never duplicating "我发送的".
+          if (scope === 'session') return rows.filter(file => file.source !== 'attachment')
+          return rows
+        }, [scope, pinRows, sentAllRows, currentData, matchesRegion, regionTarget])
+
+        useEffect(() => {
+          if (!currentData) return
+          const key = `${inventorySessionId || 'default'}:${inventoryScope}`
+          const rows = Array.isArray(currentData.files) ? currentData.files : []
+          const count = inventoryScope === 'session'
+            ? rows.filter(f => f.source !== 'attachment' && !(f.source === 'read' && !isReadableFile(f))).length
+            : rows.length
+          setTabCounts(prev => prev[key] === count ? prev : { ...prev, [key]: count })
+        }, [currentData, inventoryScope, inventorySessionId])
 
         const matchesQuery = (file) => {
           const needle = query.trim().toLowerCase()
-          return needle.length === 0
-            || `${file.name} ${file.rel} ${file.path} ${file.description || ''}`.toLowerCase().includes(needle)
+          if (needle.length === 0) return true
+          const categoryText = t(CATEGORY_LABELS[file.category] || 'filter.other')
+          return `${file.name} ${file.rel} ${file.path} ${file.description || ''} ${file.projectName || ''} ${file.sessionTitle || ''} ${categoryText} ${file.reference ? '引用 reference' : ''}`.toLowerCase().includes(needle)
         }
+
+        const isVisibleInDefaultAll = useCallback((file) => {
+          if (scope === 'session') return file.source !== 'attachment' && !(file.source === 'read' && !isReadableFile(file))
+          return true
+        }, [scope])
+
+        const fileMatchesSource = useCallback((file, filter) => {
+          if (!filter || filter === 'all') return true
+          if (filter === 'pinned') return pinKeys.has(pathKey(file.path))
+          return matchesSourceFilter(file, filter)
+        }, [pinKeys])
 
         const categoryCounts = useMemo(() => {
           const counts = {}
-          let total = 0
+          let allRecommended = 0
+          const hasFilter = sourceFilter !== 'all' || query.trim().length > 0 || archivedOnly
           for (const file of baseFiles) {
             if (!matchesQuery(file)) continue
-            if (sourceFilter !== 'all' && file.source !== sourceFilter) continue
+            if (!fileMatchesSource(file, sourceFilter)) continue
             if (archivedOnly && file.archived !== true) continue
-            counts[file.category] = (counts[file.category] || 0) + 1
-            total += 1
+            const cat = file.category || categoryOf(file)
+            counts[cat] = (counts[cat] || 0) + 1
+            if (hasFilter || isVisibleInDefaultAll(file)) {
+              allRecommended += 1
+            }
           }
-          return { counts, total }
-        }, [baseFiles, query, sourceFilter, archivedOnly])
+          return { counts, total: allRecommended }
+        }, [baseFiles, query, sourceFilter, archivedOnly, fileMatchesSource, isVisibleInDefaultAll])
 
         const sourceCounts = useMemo(() => {
           const counts = {}
@@ -777,10 +1181,12 @@ window.__ModuleLoader__.load({
             if (!matchesQuery(file)) continue
             if (archivedOnly && file.archived !== true) continue
             counts[file.source] = (counts[file.source] || 0) + 1
+            if (file.reference === true) counts.reference = (counts.reference || 0) + 1
+            if (pinKeys.has(pathKey(file.path))) counts.pinned = (counts.pinned || 0) + 1
             total += 1
           }
           return { counts, total }
-        }, [baseFiles, query, archivedOnly])
+        }, [baseFiles, query, archivedOnly, pinKeys])
 
         const archivedCount = useMemo(() => {
           let total = 0
@@ -788,85 +1194,130 @@ window.__ModuleLoader__.load({
             if (file.archived !== true) continue
             if (!matchesQuery(file)) continue
             if (category !== 'all' && file.category !== category) continue
-            if (sourceFilter !== 'all' && file.source !== sourceFilter) continue
+            if (!fileMatchesSource(file, sourceFilter)) continue
             total += 1
           }
           return total
-        }, [baseFiles, query, category, sourceFilter])
+        }, [baseFiles, query, category, sourceFilter, fileMatchesSource])
 
         const visibleFiles = useMemo(() => {
           let rows = baseFiles.slice()
-          const needle = query.trim().toLowerCase()
-          if (needle.length > 0) {
-            rows = rows.filter(file => `${file.name} ${file.rel} ${file.path} ${file.description || ''}`.toLowerCase().includes(needle))
-          }
-          if (category !== 'all') rows = rows.filter(file => file.category === category)
-          if (sourceFilter !== 'all') rows = rows.filter(file => file.source === sourceFilter)
+          rows = rows.filter(matchesQuery)
+          if (sourceFilter !== 'all') rows = rows.filter(file => fileMatchesSource(file, sourceFilter))
           if (archivedOnly) rows = rows.filter(file => file.archived === true)
+          if (category !== 'all') {
+            rows = rows.filter(file => (file.category || categoryOf(file)) === category)
+          } else if (sourceFilter === 'all' && query.trim().length === 0 && !archivedOnly) {
+            rows = rows.filter(isVisibleInDefaultAll)
+          }
           rows.sort((left, right) => {
+            if (scope === 'session') {
+              const lp = pinKeys.has(pathKey(left.path))
+              const rp = pinKeys.has(pathKey(right.path))
+              if (lp !== rp) return lp ? -1 : 1
+            }
             if (sort === 'name') return String(left.name).localeCompare(String(right.name), undefined, { sensitivity: 'base' })
             if (sort === 'type') {
               const byType = String(left.category).localeCompare(String(right.category))
               if (byType !== 0) return byType
               return String(left.name).localeCompare(String(right.name), undefined, { sensitivity: 'base' })
             }
+            if (sort === 'timeAsc') return (left.mtime || left.addedAt || 0) - (right.mtime || right.addedAt || 0)
             return (right.mtime || right.addedAt || 0) - (left.mtime || left.addedAt || 0)
           })
           return rows
-        }, [baseFiles, query, category, sort, sourceFilter, archivedOnly])
+        }, [baseFiles, query, category, sort, sourceFilter, archivedOnly, scope, pinKeys, isVisibleInDefaultAll])
 
         const fileGroups = useMemo(() => {
-          if (groupMode !== 'project' || (scope !== 'sent' && scope !== 'project')) return null
+          if (groupMode !== 'project') return null
+          const activeProjCwd = regionTarget.kind === 'history-project'
+            ? regionTarget.cwd
+            : regionTarget.kind === 'history-session'
+              ? (regionTarget.cwd || inventoryCwd)
+              : cwd
           const projects = new Map()
           for (const file of visibleFiles) {
-            const projectPath = file.cwd || inventoryCwd || file.projectName || ''
-            const projectKey = projectPath ? pathKey(projectPath) : '__unknown__'
-            let project = projects.get(projectKey)
+            const fileCwd = file.cwd || (file.sessionId === sessionId ? cwd : '')
+            const rawProjectKey = fileCwd
+              ? pathKey(fileCwd)
+              : file.projectName
+                ? `name:${String(file.projectName).toLowerCase()}`
+                : '__standalone__'
+            let project = projects.get(rawProjectKey)
             if (project === undefined) {
+              const name = file.projectName || (fileCwd ? baseName(fileCwd) : t('group.standalone'))
               project = {
-                key: projectKey,
-                name: file.projectName || baseName(projectPath) || t('group.unknown'),
-                path: projectPath,
+                key: rawProjectKey,
+                name,
+                path: fileCwd || '',
+                isCurrent: Boolean(
+                  (activeProjCwd && fileCwd && pathKey(fileCwd) === pathKey(activeProjCwd))
+                  || (!fileCwd && rawProjectKey === '__standalone__' && !activeProjCwd),
+                ),
                 files: 0,
+                latestTime: 0,
                 sessions: new Map(),
               }
-              projects.set(projectKey, project)
+              projects.set(rawProjectKey, project)
             }
             const isWorkspace = file.source === 'workspace'
-            const sessionKey = isWorkspace ? 'workspace' : (file.sessionId || 'session')
+            const rowSessionId = file.sessionId || inventorySessionId || sessionId || 'session'
+            const sessionKey = isWorkspace ? 'workspace' : rowSessionId
             let session = project.sessions.get(sessionKey)
             if (session === undefined) {
+              const isCurrentSession = !isWorkspace && (sessionKey === sessionId || sessionKey === inventorySessionId)
               session = {
                 key: sessionKey,
+                isCurrent: isCurrentSession,
+                latestTime: 0,
                 name: isWorkspace
                   ? t('group.workspace')
                   : file.sessionTitle
-                    || (file.sessionId === inventorySessionId ? sessionTitle : undefined)
-                    || t('group.untitled'),
+                    || (sessionKey === inventorySessionId ? inventoryTitle : undefined)
+                    || (sessionKey === sessionId ? sessionTitle : undefined)
+                    || `${t('group.untitled')} (${String(sessionKey).slice(0, 6)})`,
                 files: [],
               }
               project.sessions.set(sessionKey, session)
             }
+            const fileTime = Number(file.mtime || file.addedAt || 0)
+            if (fileTime > session.latestTime) session.latestTime = fileTime
+            if (fileTime > project.latestTime) project.latestTime = fileTime
+            if (session.isCurrent) project.isCurrent = true
             session.files.push(file)
             project.files += 1
           }
-          return [...projects.values()].map(project => ({ ...project, sessions: [...project.sessions.values()] }))
-        }, [visibleFiles, scope, inventoryCwd, inventorySessionId, sessionTitle, t, groupMode])
+          return [...projects.values()]
+            .sort((a, b) => ((b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0)) || (b.latestTime - a.latestTime))
+            .map(project => ({
+              ...project,
+              sessions: [...project.sessions.values()]
+                .sort((a, b) => ((b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0)) || (b.latestTime - a.latestTime)),
+            }))
+        }, [visibleFiles, regionTarget, inventoryCwd, inventorySessionId, inventoryTitle, sessionId, sessionTitle, cwd, t, groupMode])
 
         const categoryGroups = useMemo(() => {
           if (groupMode !== 'category' || category !== 'all') return null
-          const groups = new Map()
+          const buckets = new Map()
           for (const file of visibleFiles) {
-            const key = file.category || 'other'
-            let group = groups.get(key)
+            const key = file.category || categoryOf(file) || 'other'
+            let group = buckets.get(key)
             if (group === undefined) {
               group = { key, files: [], filesCount: 0 }
-              groups.set(key, group)
+              buckets.set(key, group)
             }
             group.files.push(file)
             group.filesCount += 1
           }
-          return [...groups.values()]
+          const ordered = []
+          for (const key of CATEGORY_ORDER) {
+            const hit = buckets.get(key)
+            if (hit) ordered.push(hit)
+          }
+          for (const [key, hit] of buckets.entries()) {
+            if (!CATEGORY_ORDER.includes(key)) ordered.push(hit)
+          }
+          return ordered
         }, [visibleFiles, category, groupMode])
 
         const selectedFiles = useMemo(
@@ -874,7 +1325,7 @@ window.__ModuleLoader__.load({
           [baseFiles, selected],
         )
 
-        /* List of history sessions to draw in the chooser. */
+        /* List of history sessions shown inside the top Scope dropdown. */
         const historyOptions = useMemo(() => {
           const merged = new Map()
           for (const row of historySessions) {
@@ -895,13 +1346,10 @@ window.__ModuleLoader__.load({
               updatedAt: row.updatedAt || 0,
             })
           }
-          let rows = [...merged.values()].filter(row => row.id !== sessionId)
-          const needle = query.trim().toLowerCase()
-          if (needle.length > 0) {
-            rows = rows.filter(row => `${row.displayTitle} ${row.cwd || ''}`.toLowerCase().includes(needle))
-          }
-          return rows.sort((left, right) => right.updatedAt - left.updatedAt)
-        }, [historySessions, sessions, sessionId, query])
+          return [...merged.values()]
+            .filter(row => row.id !== sessionId)
+            .sort((left, right) => right.updatedAt - left.updatedAt)
+        }, [historySessions, sessions, sessionId])
 
         const historyGroups = useMemo(() => {
           const groups = new Map()
@@ -923,6 +1371,102 @@ window.__ModuleLoader__.load({
           }
           return [...groups.values()].sort((left, right) => right.updatedAt - left.updatedAt)
         }, [historyOptions, t])
+
+        const buildScopeTree = useCallback((rows) => {
+          const projects = new Map()
+          let curSessionCount = 0
+          let curProjectCount = 0
+          for (const row of rows) {
+            if (row.sessionId && row.sessionId === sessionId) curSessionCount += 1
+            const rowCwd = row.cwd || ''
+            const inCurProj = Boolean(cwd && (
+              (rowCwd && pathKey(rowCwd) === pathKey(cwd))
+              || (!rowCwd && row.path && pathKey(row.path).startsWith(pathKey(cwd)))
+            ))
+            if (inCurProj || (!cwd && row.sessionId === sessionId)) curProjectCount += 1
+            const pKey = rowCwd
+              ? pathKey(rowCwd)
+              : row.projectName
+                ? `name:${String(row.projectName).toLowerCase()}`
+                : '__standalone__'
+            let proj = projects.get(pKey)
+            if (proj === undefined) {
+              proj = {
+                key: pKey,
+                cwd: rowCwd,
+                name: row.projectName || (rowCwd ? baseName(rowCwd) : t('group.standalone')),
+                isCurrent: inCurProj,
+                count: 0,
+                latestTime: 0,
+                repSessionId: row.sessionId || sessionId,
+                sessions: new Map(),
+              }
+              projects.set(pKey, proj)
+            }
+            proj.count += 1
+            const tm = Number(row.mtime || row.addedAt || 0)
+            if (tm > proj.latestTime) proj.latestTime = tm
+            if (inCurProj) proj.isCurrent = true
+            const sId = row.sessionId || '__none__'
+            let sess = proj.sessions.get(sId)
+            if (sess === undefined) {
+              sess = {
+                id: sId,
+                isCurrent: sId === sessionId,
+                title: row.sessionTitle || (sId === sessionId ? sessionTitle : `${t('group.untitled')} (${String(sId).slice(0, 6)})`),
+                cwd: rowCwd,
+                count: 0,
+                latestTime: 0,
+              }
+              proj.sessions.set(sId, sess)
+            }
+            sess.count += 1
+            if (tm > sess.latestTime) sess.latestTime = tm
+          }
+          const sortedProjects = [...projects.values()]
+            .sort((a, b) => ((b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0)) || (b.latestTime - a.latestTime))
+            .map(proj => ({
+              ...proj,
+              sessions: [...proj.sessions.values()]
+                .sort((a, b) => ((b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0)) || (b.latestTime - a.latestTime)),
+            }))
+          return { total: rows.length, curSessionCount, curProjectCount, projects: sortedProjects }
+        }, [sessionId, sessionTitle, cwd, t])
+
+        const sentScopeStats = useMemo(() => buildScopeTree(sentAllRows), [sentAllRows, buildScopeTree])
+        const pinScopeStats = useMemo(() => buildScopeTree(pinRows), [pinRows, buildScopeTree])
+
+        const projectDirectories = useMemo(() => {
+          const byCwd = new Map()
+          const addSession = (s) => {
+            if (!s || !s.cwd) return
+            const key = pathKey(s.cwd)
+            let item = byCwd.get(key)
+            if (item === undefined) {
+              item = {
+                key,
+                cwd: s.cwd,
+                name: baseName(s.cwd),
+                repSessionId: s.id,
+                isCurrent: Boolean(cwd && pathKey(cwd) === key),
+                updatedAt: s.updatedAt || 0,
+                sessionCount: 0,
+              }
+              byCwd.set(key, item)
+            }
+            item.sessionCount += 1
+            if ((s.updatedAt || 0) >= item.updatedAt) {
+              item.updatedAt = s.updatedAt || 0
+              item.repSessionId = s.id
+            }
+          }
+          if (cwd && sessionId) {
+            addSession({ id: sessionId, cwd, updatedAt: Date.now() })
+          }
+          for (const row of historyOptions) addSession(row)
+          return [...byCwd.values()]
+            .sort((a, b) => ((b.isCurrent ? 1 : 0) - (a.isCurrent ? 1 : 0)) || (b.updatedAt - a.updatedAt))
+        }, [historyOptions, cwd, sessionId])
 
         /* ─────────────────────────── actions ─────────────────────────── */
 
@@ -1047,6 +1591,8 @@ window.__ModuleLoader__.load({
           let objectUrl
           const sourceSession = file.sessionId || inventorySessionId || sessionId
           const sourcePath = file.previewPath || file.path
+          viewerStartedAtRef.current = Date.now()
+          setLoadElapsedMs(0)
           setViewerState({ status: 'loading', file })
           void (async () => {
             try {
@@ -1139,30 +1685,105 @@ window.__ModuleLoader__.load({
           if (cached && (cached.loading || cached.loaded)) return
           appCache.current[key] = { loading: true, loaded: false, list: [] }
           setAppRevision(value => value + 1)
+          const mergeAppLists = (nativeList, detectedList) => {
+            const merged = []
+            const findExisting = (candidate) => {
+              const candName = String(candidate.name || candidate.id || '').toLowerCase().replace(/\s+/g, '')
+              const candExe = candidate.exe ? baseName(candidate.exe).toLowerCase().replace(/\.exe$/i, '') : ''
+              return merged.find(item => {
+                const itemName = String(item.name || item.id || '').toLowerCase().replace(/\s+/g, '')
+                const itemExe = item.exe ? baseName(item.exe).toLowerCase().replace(/\.exe$/i, '') : ''
+                if (itemName && candName && (itemName === candName || itemName.includes(candName) || candName.includes(itemName))) return true
+                if (itemExe && candExe && itemExe === candExe && (!item.id?.includes('wps-') && !candidate.id?.includes('wps-'))) return true
+                return false
+              })
+            }
+            for (const app of nativeList) {
+              merged.push({
+                id: app.id,
+                nativeId: app.id,
+                name: app.name || app.id,
+                ...(app.default ? { default: true } : {}),
+              })
+            }
+            for (const app of detectedList) {
+              const hit = findExisting(app)
+              if (hit !== undefined) {
+                hit.serverAppId = app.id
+                if (!hit.exe && app.exe) hit.exe = app.exe
+                if (app.default) hit.default = true
+              } else {
+                merged.push({
+                  id: `app:${app.id}`,
+                  serverAppId: app.id,
+                  name: app.name || app.id,
+                  exe: app.exe,
+                  ...(app.default ? { default: true } : {}),
+                })
+              }
+            }
+            return merged.sort((a, b) => (b.default ? 1 : 0) - (a.default ? 1 : 0))
+          }
           try {
-            const result = await ctx.remote.session.workspacePathApplications({ path: file.path })
+            const [nativeRes, detectedRes] = await Promise.allSettled([
+              ctx.remote.session.workspacePathApplications({ path: file.path }),
+              api(`/api/file-launcher.apps?path=${encodeURIComponent(file.path)}`),
+            ])
+            const nativeList = nativeRes.status === 'fulfilled' && nativeRes.value?.ok === true && Array.isArray(nativeRes.value.value)
+              ? nativeRes.value.value
+              : []
+            const detectedList = detectedRes.status === 'fulfilled' && detectedRes.value?.ok === true && Array.isArray(detectedRes.value.apps)
+              ? detectedRes.value.apps
+              : []
+            const detectStatus = detectedRes.status === 'rejected' && detectedRes.reason && typeof detectedRes.reason.status === 'number'
+              ? detectedRes.reason.status
+              : 0
+            const hostOutdated = detectedRes.status === 'rejected' && detectStatus === 404
+            const merged = mergeAppLists(nativeList, detectedList)
             appCache.current[key] = {
               loading: false,
-              loaded: true,
-              list: result.ok === true && Array.isArray(result.value) ? result.value : [],
-              ...(result.ok === true ? {} : { error: result.error && result.error.message }),
+              loaded: !hostOutdated && (merged.length > 0 || detectedRes.status === 'fulfilled'),
+              hostOutdated,
+              list: merged,
             }
           } catch (caught) {
-            appCache.current[key] = { loading: false, loaded: true, list: [], error: caught instanceof Error ? caught.message : String(caught) }
+            appCache.current[key] = { loading: false, loaded: false, list: [], error: caught instanceof Error ? caught.message : String(caught) }
           }
           setAppRevision(value => value + 1)
-        }, [])
+        }, [ctx])
 
         const openNative = useCallback(async (file, application) => {
+          const isObj = application !== undefined && application !== null && typeof application === 'object'
+          const nativeId = isObj ? application.nativeId : application
+          const serverAppId = isObj ? application.serverAppId : undefined
           try {
-            const request = { path: file.path, ...(application ? { application } : {}) }
-            const result = await ctx.remote.session.openWorkspacePath(request)
-            if (result.ok === true) notify(t('toast.opened'))
-            else notify(t('toast.failed', { message: result.error ? result.error.message : 'open failed' }))
+            if (nativeId || !serverAppId) {
+              const request = { path: file.path, ...(nativeId ? { application: nativeId } : {}) }
+              const result = await ctx.remote.session.openWorkspacePath(request)
+              if (result.ok === true) {
+                notify(t('toast.opened'))
+                return
+              }
+              if (!serverAppId) {
+                notify(t('toast.failed', { message: result.error ? result.error.message : 'open failed' }))
+                return
+              }
+            }
+            if (serverAppId) {
+              await api('/api/file-launcher.open-app', {
+                method: 'POST',
+                body: JSON.stringify({
+                  path: file.path,
+                  appId: serverAppId,
+                  ...(file.cwd || inventoryCwd ? { cwd: file.cwd || inventoryCwd } : {}),
+                }),
+              })
+              notify(t('toast.opened'))
+            }
           } catch (caught) {
             notify(t('toast.failed', { message: caught instanceof Error ? caught.message : String(caught) }))
           }
-        }, [ctx, notify, t])
+        }, [ctx, inventoryCwd, notify, t])
 
         const reveal = useCallback(async (file) => {
           try {
@@ -1418,116 +2039,449 @@ window.__ModuleLoader__.load({
         const canNative = desktop === true
 
         const scopes = [
-          ['session', 'scope.session'],
-          ['sent', 'scope.sent'],
-          ['project', 'scope.project'],
-          ['pins', 'scope.pins'],
-          ['history', 'scope.history'],
+          ['session', 'tab.session'],
+          ['sent', 'tab.sent'],
+          ['pins', 'tab.pinned'],
+          ['project', 'tab.project'],
         ]
 
-        const categories = ['all', 'document', 'slides', 'sheets', 'pdf', 'markdown', 'text', 'image', 'web', 'code', 'media', 'archive', 'design', 'executable', 'database', 'font', 'disk', 'binary', 'folder', 'other']
-          .filter(key => key === 'all' || (categoryCounts.counts[key] || 0) > 0 || key === category)
+        const categories = ['all', ...CATEGORY_ORDER.filter(key => (categoryCounts.counts[key] || 0) > 0 || key === category)]
 
-        const sources = ['all', 'delivered', 'attachment', 'written', 'edited', 'read', 'workspace', 'pinned']
-          .filter(key => key === 'all' || (sourceCounts.counts[key] || 0) > 0 || key === sourceFilter)
+        const sources = SOURCE_ORDER.filter(key => key === 'all' || (sourceCounts.counts[key] || 0) > 0 || key === sourceFilter)
 
-        function renderScopeTabs() {
-          return h('div', { className: 'dfl-scopes', role: 'tablist', 'aria-label': t('scope.label') },
-            scopes.map(([value, label]) => h('button', {
-              key: value,
-              type: 'button',
-              className: 'dfl-scope',
-              role: 'tab',
-              'aria-selected': scope === value,
-              'aria-pressed': scope === value,
-              onClick: () => {
-                scopeTouched.current = true
-                setScope(value)
-                setContextMenu(null)
-                setQuery('')
-                setCategory('all')
-                setSourceFilter('all')
-                setArchivedOnly(false)
-                setFilterMenu(null)
-                setSelected(new Set())
-                if (value !== 'history') setHistoryId(null)
-              },
-            }, t(label))))
+        function resetTransientFilters() {
+          setScopeMenuOpen(false)
+          setContextMenu(null)
+          setQuery('')
+          setCategory('all')
+          setSourceFilter('all')
+          setArchivedOnly(false)
+          setFilterMenu(null)
+          setSelected(new Set())
         }
 
-        function renderContextBar() {
-          if (scope === 'history' && historyId === null) return null
-          const project = scope === 'sent'
-            ? t('context.allProjects')
-            : (inventoryCwd ? baseName(inventoryCwd) : t('context.noProject'))
-          return h('div', { className: 'dfl-context-bar' },
-            h('span', { className: 'dfl-context-label' }, t('context.isolation')),
-            h('span', { className: 'dfl-context-scope' }, t(scope === 'session' ? 'scope.session' : scope === 'sent' ? 'scope.sent' : scope === 'project' ? 'scope.project' : scope === 'pins' ? 'scope.pins' : 'scope.history')),
-            h('span', { className: 'dfl-context-title', title: inventoryCwd || inventoryTitle }, inventoryTitle),
-            h('span', { className: 'dfl-context-count' }, baseFiles.length),
-            h('span', { className: 'dfl-context-project', title: project }, `${t('context.project')}: ${project}`))
+        function switchTabScope(nextScope) {
+          scopeTouched.current = true
+          setScope(nextScope)
+          resetTransientFilters()
+        }
+
+        function selectRegionTarget(nextTarget, nextTab) {
+          scopeTouched.current = true
+          if (nextTab !== undefined) setScope(nextTab)
+          setRegionTarget(nextTarget)
+          resetTransientFilters()
+        }
+
+        function renderScopeBar() {
+          const sentMatchesCurCount = sentScopeStats.curSessionCount
+          const pinMatchesCurCount = pinScopeStats.curSessionCount
+          const hasCurWorkspace = Boolean(cwd)
+          const effectiveProjCwd = regionTarget.kind === 'history-project'
+            ? regionTarget.cwd
+            : regionTarget.kind === 'history-session'
+              ? (regionTarget.cwd || inventoryCwd || cwd)
+              : cwd
+          const effectiveProjName = effectiveProjCwd
+            ? baseName(effectiveProjCwd)
+            : (regionTarget.kind === 'history-project' && regionTarget.name ? regionTarget.name : t('scope.noWorkspaceShort'))
+
+          const activeSessionCacheKey = `${inventorySessionId || 'default'}:session`
+          const activeProjectCacheKey = `${inventorySessionId || sessionId || 'default'}:project`
+
+          let currentBadgeCount = 0
+          if (scope === 'sent') {
+            currentBadgeCount = baseFiles.length
+          } else if (scope === 'pins') {
+            currentBadgeCount = baseFiles.length
+          } else if (scope === 'project') {
+            currentBadgeCount = tabCounts[activeProjectCacheKey] ?? baseFiles.length
+          } else {
+            currentBadgeCount = tabCounts[activeSessionCacheKey] ?? (categoryCounts.total || baseFiles.length)
+          }
+
+          let kindLabel = t('scope.convKind')
+          let triggerName = `${sessionTitle} (${t('scope.current')})`
+          let isHistoryBadge = regionTarget.kind === 'history-session' || regionTarget.kind === 'history-project'
+
+          if (scope === 'project') {
+            kindLabel = regionTarget.kind === 'history-project' ? t('scope.historyProjKind') : t('context.project')
+            triggerName = effectiveProjCwd
+              ? `${effectiveProjName}${regionTarget.kind === 'history-project' ? '' : ` (${t('scope.current')})`}`
+              : t('scope.noWorkspaceShort')
+            isHistoryBadge = regionTarget.kind === 'history-project' || (regionTarget.kind === 'history-session' && Boolean(regionTarget.cwd && cwd && pathKey(regionTarget.cwd) !== pathKey(cwd)))
+          } else if (regionTarget.kind === 'all') {
+            kindLabel = scope === 'sent' ? t('scope.sentAllKind') : scope === 'pins' ? t('scope.pins') : t('scope.allKind')
+            triggerName = scope === 'sent'
+              ? t('scope.sentTitle')
+              : scope === 'pins'
+                ? t('scope.pinsTitle')
+                : t('scope.allRegions')
+            isHistoryBadge = false
+          } else if (regionTarget.kind === 'current-project') {
+            kindLabel = t('context.project')
+            triggerName = cwd ? `${baseName(cwd)} (${t('scope.current')})` : t('scope.project')
+          } else if (regionTarget.kind === 'history-project') {
+            kindLabel = t('scope.historyProjKind')
+            triggerName = regionTarget.name || (regionTarget.cwd ? baseName(regionTarget.cwd) : t('group.unknown'))
+          } else if (regionTarget.kind === 'history-session') {
+            kindLabel = t('scope.historyKind')
+            triggerName = inventoryTitle
+          } else {
+            kindLabel = scope === 'sent'
+              ? t('scope.convKind')
+              : scope === 'pins'
+                ? t('scope.pins')
+                : t('scope.convKind')
+            triggerName = `${sessionTitle} (${t('scope.current')})`
+          }
+
+          const renderOptBtn = ({ key, active, icon, titleText, isCurTag, rightText, hintText, onClick }) => h('button', {
+            key,
+            type: 'button',
+            className: `dfl-scope-opt${active ? ' is-active' : ''}`,
+            title: hintText || titleText,
+            onClick,
+          },
+          h('span', { className: 'dfl-scope-opt-left' },
+            h('span', { className: 'dfl-scope-opt-icon' }, icon),
+            h('span', { className: 'dfl-scope-opt-title' }, titleText),
+            isCurTag ? h('span', { className: 'dfl-scope-opt-cur' }, t('scope.current')) : null),
+          h('span', { className: 'dfl-scope-opt-right' },
+            rightText !== undefined && rightText !== null ? h('span', null, rightText) : null,
+            active ? CheckIcon(11) : null))
+
+          let dropdownBody = null
+          if (scope === 'sent' || scope === 'pins') {
+            const stats = scope === 'sent' ? sentScopeStats : pinScopeStats
+            const sectionTitleKey = scope === 'sent' ? 'scope.sentGroupTitle' : 'scope.pinsGroupTitle'
+            const treeTitleKey = scope === 'sent' ? 'scope.sentTreeTitle' : 'scope.pinsTreeTitle'
+            const allLabelKey = scope === 'sent' ? 'scope.sentAllOption' : 'scope.pinsAllOption'
+            dropdownBody = h(React.Fragment, null,
+              h('div', { className: 'dfl-scope-group-title' }, t(sectionTitleKey)),
+              renderOptBtn({
+                key: 'cur-sess',
+                active: regionTarget.kind === 'current-session',
+                icon: ChatIcon(12),
+                titleText: sessionTitle || t('scope.session'),
+                isCurTag: true,
+                rightText: stats.curSessionCount,
+                onClick: () => selectRegionTarget({ kind: 'current-session' }),
+              }),
+              hasCurWorkspace ? renderOptBtn({
+                key: 'cur-proj',
+                active: regionTarget.kind === 'current-project',
+                icon: FolderIcon(12),
+                titleText: `${baseName(cwd)} · ${t('scope.project')}`,
+                isCurTag: true,
+                rightText: stats.curProjectCount,
+                hintText: cwd,
+                onClick: () => selectRegionTarget({ kind: 'current-project' }),
+              }) : null,
+              renderOptBtn({
+                key: 'all-regions',
+                active: regionTarget.kind === 'all',
+                icon: GlobeIcon(12),
+                titleText: t(allLabelKey),
+                rightText: stats.total,
+                onClick: () => selectRegionTarget({ kind: 'all' }),
+              }),
+              h('div', { className: 'dfl-scope-divider' }),
+              h('div', { className: 'dfl-scope-group-title' }, `${t(treeTitleKey)} (${stats.projects.length})`),
+              stats.projects.length === 0
+                ? h('div', { className: 'dfl-scope-empty-hint' }, t(scope === 'sent' ? 'empty.sent' : 'empty.pins'))
+                : stats.projects.map(proj => {
+                  const isProjAct = regionTarget.kind === 'history-project'
+                    && ((proj.cwd && regionTarget.cwd && pathKey(proj.cwd) === pathKey(regionTarget.cwd))
+                    || (!proj.cwd && regionTarget.name === proj.name))
+                  return h(React.Fragment, { key: proj.key },
+                    h('button', {
+                      type: 'button',
+                      className: `dfl-scope-opt dfl-scope-proj-opt${isProjAct ? ' is-active' : ''}`,
+                      title: proj.cwd ? `${proj.name}\n${proj.cwd}` : proj.name,
+                      onClick: () => selectRegionTarget({
+                        kind: 'history-project',
+                        cwd: proj.cwd,
+                        name: proj.name,
+                        repSessionId: proj.repSessionId,
+                      }),
+                    },
+                    h('span', { className: 'dfl-scope-opt-left' },
+                      h('span', { className: 'dfl-scope-opt-icon' }, FolderIcon(12)),
+                      h('span', { className: 'dfl-scope-opt-title' }, proj.name),
+                      proj.isCurrent ? h('span', { className: 'dfl-scope-opt-cur' }, t('scope.current')) : null),
+                    h('span', { className: 'dfl-scope-opt-right' },
+                      h('span', null, proj.count),
+                      isProjAct ? CheckIcon(11) : null)),
+                    proj.sessions.map(sess => {
+                      if (sess.id === '__none__') return null
+                      const isSessAct = (regionTarget.kind === 'history-session' && regionTarget.sessionId === sess.id)
+                        || (regionTarget.kind === 'current-session' && sess.id === sessionId)
+                      return h('button', {
+                        key: `${proj.key}:${sess.id}`,
+                        type: 'button',
+                        className: `dfl-scope-opt dfl-scope-nested-opt${isSessAct ? ' is-active' : ''}`,
+                        title: sess.title,
+                        onClick: () => selectRegionTarget(
+                          sess.id === sessionId
+                            ? { kind: 'current-session' }
+                            : { kind: 'history-session', sessionId: sess.id, cwd: sess.cwd || proj.cwd, title: sess.title },
+                        ),
+                      },
+                      h('span', { className: 'dfl-scope-opt-left' },
+                        h('span', { className: 'dfl-scope-opt-icon' }, ChatIcon(11)),
+                        h('span', { className: 'dfl-scope-opt-title' }, sess.title),
+                        sess.isCurrent ? h('span', { className: 'dfl-scope-opt-cur' }, t('scope.current')) : null),
+                      h('span', { className: 'dfl-scope-opt-right' },
+                        h('span', null, sess.count),
+                        isSessAct ? CheckIcon(11) : null))
+                    }))
+                }))
+          } else if (scope === 'project') {
+            dropdownBody = h(React.Fragment, null,
+              h('div', { className: 'dfl-scope-group-title' }, t('scope.projectGroupTitle')),
+              projectDirectories.length === 0
+                ? h('div', { className: 'dfl-scope-empty-hint' }, t('empty.project'))
+                : projectDirectories.map(proj => {
+                  const isAct = effectiveProjCwd && pathKey(proj.cwd) === pathKey(effectiveProjCwd)
+                  return renderOptBtn({
+                    key: proj.key,
+                    active: isAct,
+                    icon: FolderIcon(12),
+                    titleText: proj.name,
+                    isCurTag: proj.isCurrent,
+                    rightText: t('scope.sessionCount', { count: proj.sessionCount }),
+                    hintText: proj.cwd,
+                    onClick: () => selectRegionTarget(
+                      proj.isCurrent
+                        ? { kind: 'current-project' }
+                        : { kind: 'history-project', cwd: proj.cwd, name: proj.name, repSessionId: proj.repSessionId },
+                    ),
+                  })
+                }))
+          } else {
+            dropdownBody = h(React.Fragment, null,
+              h('div', { className: 'dfl-scope-group-title' }, t('scope.currentSessionGroup')),
+              renderOptBtn({
+                key: 'cur-sess',
+                active: regionTarget.kind === 'current-session',
+                icon: ChatIcon(12),
+                titleText: sessionTitle || t('scope.session'),
+                isCurTag: true,
+                rightText: tabCounts[`${sessionId}:session`],
+                onClick: () => selectRegionTarget({ kind: 'current-session' }),
+              }),
+              hasCurWorkspace ? renderOptBtn({
+                key: 'cur-proj-switch',
+                active: false,
+                icon: FolderIcon(12),
+                titleText: `${baseName(cwd)} · ${t('tab.project')}`,
+                rightText: tabCounts[`${sessionId}:project`],
+                hintText: cwd,
+                onClick: () => selectRegionTarget({ kind: 'current-project' }, 'project'),
+              }) : null,
+              h('div', { className: 'dfl-scope-divider' }),
+              h('div', { className: 'dfl-scope-group-title' }, `${t('scope.history')} (${historyOptions.length})`),
+              historyOptions.length === 0
+                ? h('div', { className: 'dfl-scope-empty-hint' }, t('empty.history'))
+                : historyGroups.map(group => h(React.Fragment, { key: group.key || '__none__' },
+                  h('div', { className: 'dfl-scope-sub-group', title: group.cwd || '' }, `📁 ${group.name}`),
+                  group.sessions.map(row => renderOptBtn({
+                    key: row.id,
+                    active: regionTarget.kind === 'history-session' && regionTarget.sessionId === row.id,
+                    icon: ChatIcon(11),
+                    titleText: row.displayTitle,
+                    hintText: row.cwd ? `${row.displayTitle}\n${row.cwd}` : row.displayTitle,
+                    rightText: row.updatedAt ? formatTime(row.updatedAt) : undefined,
+                    onClick: () => selectRegionTarget({
+                      kind: 'history-session',
+                      sessionId: row.id,
+                      cwd: row.cwd,
+                      title: row.displayTitle,
+                    }),
+                  })))))
+          }
+
+          const scopeDropdown = !scopeMenuOpen ? null : ReactDOM.createPortal(
+            h('div', {
+              className: 'dfl-scope-dropdown dfl-theme',
+              ...themeAttributes(preferences, scheme),
+              role: 'listbox',
+              style: {
+                left: `${scopePos.left}px`,
+                top: `${scopePos.top}px`,
+                width: `${scopePos.width}px`,
+                maxHeight: `${scopePos.maxHeight || 380}px`,
+              },
+            }, dropdownBody),
+            document.body,
+          )
+
+          const isDefaultLocal = regionTarget.kind === 'current-session'
+            || (scope === 'project' && regionTarget.kind === 'current-project')
+
+          return h('div', { className: 'dfl-scope-bar', title: t('scope.isolationHint') },
+            h('span', { className: 'dfl-scope-bar-label' }, t('context.isolation')),
+            h('div', { className: 'dfl-scope-select-wrap' },
+              h('button', {
+                ref: scopeBtnRef,
+                type: 'button',
+                className: `dfl-scope-trigger${scopeMenuOpen ? ' is-open' : ''}`,
+                'aria-expanded': scopeMenuOpen,
+                onClick: () => setScopeMenuOpen(open => !open),
+              },
+              h('span', { className: 'dfl-scope-trigger-left' },
+                h('span', { className: `dfl-scope-kind-badge${isHistoryBadge ? ' is-history' : ''}` }, kindLabel),
+                h('span', { className: 'dfl-scope-trigger-name' }, triggerName)),
+              h('span', { className: 'dfl-scope-trigger-right' },
+                h('span', null, currentBadgeCount),
+                CaretDownIcon(11))),
+              scopeDropdown),
+            !isDefaultLocal
+              ? h('button', {
+                type: 'button',
+                className: 'dfl-scope-back-btn',
+                title: t('action.backCurrentHint'),
+                onClick: () => selectRegionTarget({ kind: scope === 'project' ? 'current-project' : 'current-session' }),
+              }, t('action.backCurrent'))
+              : h('span', { className: 'dfl-scope-proj-stat', title: inventoryCwd || '' },
+                scope === 'sent'
+                  ? t('scope.projStat', { count: sentScopeStats.projects.length })
+                  : scope === 'project'
+                    ? t('scope.projStat', { count: projectDirectories.length })
+                    : t('scope.sessionCount', { count: historyOptions.length + 1 })))
+        }
+
+        function renderHeader() {
+          const sortOrder = ['time', 'timeAsc', 'name', 'type']
+          const sortLabelKey = sort === 'timeAsc' ? 'sort.timeAsc'
+            : sort === 'name' ? 'sort.name'
+              : sort === 'type' ? 'sort.type'
+                : 'sort.time'
+          const groupLabelKey = groupMode === 'project'
+            ? 'group.byProject'
+            : groupMode === 'flat'
+              ? 'group.flat'
+              : 'group.byCategory'
+          const cycleSort = () => {
+            setSort(value => sortOrder[(sortOrder.indexOf(value) + 1) % sortOrder.length])
+          }
+          const cycleGroup = () => {
+            setGroupModeForActiveTab(value => (value === 'category' ? 'project' : value === 'project' ? 'flat' : 'category'))
+          }
+
+          const countForTab = (tabName) => {
+            if (tabName === 'pins') {
+              return pinRows.filter(row => matchesRegion(row, regionTarget)).length
+            }
+            if (tabName === 'sent') {
+              if (sentData !== null || scope === 'sent') {
+                return sentAllRows.filter(row => matchesRegion(row, regionTarget)).length
+              }
+              return undefined
+            }
+            if (tabName === scope) return categoryCounts.total
+            const cacheKey = `${inventorySessionId || sessionId || 'default'}:${tabName}`
+            return tabCounts[cacheKey]
+          }
+
+          return h('header', { className: 'dfl-codex-header' },
+            h('div', { className: 'dfl-seg-tabs', role: 'tablist', 'aria-label': t('scope.label') },
+              scopes.map(([value, labelKey]) => {
+                const count = countForTab(value)
+                return h('button', {
+                  key: value,
+                  type: 'button',
+                  className: `dfl-seg-tab${scope === value ? ' is-active' : ''}`,
+                  role: 'tab',
+                  'aria-selected': scope === value,
+                  'aria-pressed': scope === value,
+                  onClick: () => switchTabScope(value),
+                },
+                h('span', null, t(labelKey)),
+                typeof count === 'number' ? h('span', { className: 'dfl-seg-count' }, count) : null)
+              })),
+            h('div', { className: 'dfl-header-right' },
+              h('button', {
+                type: 'button',
+                className: `dfl-icon-btn dfl-select-toggle${selectMode ? ' is-active' : ''}`,
+                title: selectMode ? t('action.done') : t('action.select'),
+                'aria-pressed': selectMode,
+                onClick: () => { setSelectMode(value => !value); setSelected(new Set()); setContextMenu(null) },
+              }, h('span', null, selectMode ? t('action.done') : t('action.select'))),
+              h('button', {
+                type: 'button',
+                className: 'dfl-icon-btn is-active dfl-sort-btn',
+                title: `${t('sort.label')}: ${t(sortLabelKey)}`,
+                'aria-label': `${t('sort.label')}: ${t(sortLabelKey)}`,
+                onClick: cycleSort,
+              }, h('span', null, t(sortLabelKey))),
+              h('button', {
+                type: 'button',
+                className: `dfl-icon-btn dfl-group-toggle${groupMode !== 'flat' ? ' is-active' : ''}`,
+                title: t(groupLabelKey),
+                onClick: cycleGroup,
+              }, h('span', null, t(groupLabelKey))),
+              h('button', {
+                type: 'button',
+                className: `dfl-icon-btn dfl-refresh-btn${loading ? ' is-loading' : ''}`,
+                title: t('action.refresh'),
+                'aria-label': t('action.refresh'),
+                onClick: refresh,
+              }, RefreshIcon(13))))
+        }
+
+        function renderRegionPills() {
+          if (scope !== 'sent' && scope !== 'pins') return null
+          const stats = scope === 'sent' ? sentScopeStats : pinScopeStats
+          const pill = (kind, label, count) => h('button', {
+            key: kind,
+            type: 'button',
+            className: `dfl-region-pill${regionTarget.kind === kind ? ' is-active' : ''}`,
+            onClick: () => selectRegionTarget({ kind }),
+          }, h('span', null, label), h('span', { className: 'dfl-region-num' }, count))
+
+          return h('div', { className: 'dfl-region-strip' },
+            h('span', { className: 'dfl-region-label' }, t('scope.regionStripLabel')),
+            pill('current-session', t('scope.session'), stats.curSessionCount),
+            cwd ? pill('current-project', t('scope.project'), stats.curProjectCount) : null,
+            pill('all', t('context.allProjects'), stats.total),
+            (regionTarget.kind === 'history-session' || regionTarget.kind === 'history-project')
+              ? h('span', { className: 'dfl-region-custom' },
+                regionTarget.kind === 'history-project'
+                  ? `📁 ${regionTarget.name}`
+                  : `💬 ${inventoryTitle}`)
+              : null)
         }
 
         function renderCategoryTabs() {
-          if (scope === 'history' && historyId === null) return null
           if (baseFiles.length === 0) return null
-          return h('div', { className: 'dfl-category-tabs', role: 'tablist', 'aria-label': t('filter.allFiles') },
+          const allLabelKey = archivedOnly
+            ? 'filter.allArchived'
+            : scope === 'sent'
+              ? 'filter.allSent'
+              : scope === 'pins'
+                ? 'filter.allPinned'
+                : 'filter.recommended'
+          return h('div', { className: 'dfl-cat-bar', role: 'tablist', 'aria-label': t('filter.allFiles') },
             categories.map(key => h('button', {
               key,
               type: 'button',
               role: 'tab',
-              className: `dfl-category-tab${category === key ? ' is-active' : ''}`,
+              className: `dfl-cat-pill${category === key ? ' is-active' : ''}`,
               'aria-selected': category === key,
               onClick: () => {
                 setCategory(key)
                 setFilterMenu(null)
               },
             },
-            h('span', { className: 'dfl-category-tab-label' }, key === 'all' ? t('filter.allFiles') : t(CATEGORY_LABELS[key])),
-            h('span', { className: 'dfl-category-tab-count' }, key === 'all' ? categoryCounts.total : categoryCounts.counts[key] || 0))))
-        }
-
-        function renderHeader() {
-          return h('div', { className: 'dfl-head' },
-            h('div', { className: 'dfl-title-row' },
-              h('div', { className: 'dfl-title' },
-                scope === 'history' && historyId !== null ? h('button', {
-                  type: 'button', className: 'dfl-head-back',
-                  title: t('history.back'), 'aria-label': t('history.back'),
-                  onClick: () => {
-                    setHistoryId(null)
-                    setData(null)
-                    setQuery('')
-                    setCategory('all')
-                    setSourceFilter('all')
-                    setArchivedOnly(false)
-                    setFilterMenu(null)
-                  },
-                }, '←') : null,
-                h(LauncherGlyph, { size: 17 }),
-                h('span', { className: 'dfl-title-text' }, t('type.label'))),
-              h('div', { className: 'dfl-head-actions' },
-                h('button', {
-                  type: 'button', className: 'dfl-tool', title: t('action.refresh'), 'aria-label': t('action.refresh'),
-                  onClick: refresh,
-                }, '⟳'),
-                h('button', {
-                  type: 'button',
-                  className: `dfl-tool dfl-select-toggle${selectMode ? ' is-on' : ''}`,
-                  title: selectMode ? t('action.done') : t('action.select'),
-                  'aria-pressed': selectMode,
-                  onClick: () => { setSelectMode(value => !value); setSelected(new Set()); setContextMenu(null) },
-                }, selectMode ? t('action.done') : t('action.select')))),
-            h('div', { className: 'dfl-subtitle', title: inventoryCwd || '' },
-              h('span', { className: 'dfl-subtitle-title' }, inventoryTitle),
-              inventoryCwd && scope !== 'sent' ? h('span', { className: 'dfl-subtitle-path' }, inventoryCwd) : null),
-          )
+            h('span', null, key === 'all' ? t(allLabelKey) : t(CATEGORY_LABELS[key])),
+            h('span', { className: 'dfl-cat-num' }, key === 'all' ? categoryCounts.total : categoryCounts.counts[key] || 0))))
         }
 
         function renderToolbar() {
-          const showFilters = scope !== 'history' || historyId !== null
-          const activeCount = (category !== 'all' ? 1 : 0) + (sourceFilter !== 'all' ? 1 : 0) + (archivedOnly ? 1 : 0)
-          const hasActiveFilters = activeCount > 0
+          const activeFilterCount = (category !== 'all' ? 1 : 0) + (sourceFilter !== 'all' ? 1 : 0)
+          const hasAnyFilter = activeFilterCount > 0 || archivedOnly || query.trim().length > 0
 
           const filterOption = (kind, key, label, count, isOn) => h('button', {
             key: `${kind}:${key}`,
@@ -1547,107 +2501,131 @@ window.__ModuleLoader__.load({
           },
           h('span', { className: 'dfl-filter-option-label' }, label),
           h('span', { className: 'dfl-filter-option-count' }, count),
-          isOn ? h('span', { className: 'dfl-filter-check', 'aria-hidden': true }, '✓') : null)
+          isOn ? h('span', { className: 'dfl-filter-check', 'aria-hidden': true }, CheckIcon(11)) : null)
 
-          const activeTag = (key, label, clear) => h('span', { key, className: 'dfl-filter-tag' },
-            h('span', { className: 'dfl-filter-tag-label' }, label),
+          const activeTag = (key, label, clear) => h('span', { key, className: 'dfl-filter-chip' },
+            h('span', null, label),
             h('button', {
-              type: 'button', className: 'dfl-filter-tag-clear',
-              'aria-label': t('filter.clear'), title: t('filter.clear'),
+              type: 'button',
+              'aria-label': t('filter.clear'),
+              title: t('filter.clear'),
               onClick: clear,
             }, '×'))
 
-          const filterPanel = () => filterMenu !== 'panel' ? null : h('div', {
-            className: 'dfl-filter-popover dfl-filter-panel',
-            role: 'menu',
-          },
-          h('div', { className: 'dfl-filter-panel-head' },
-            h('span', { className: 'dfl-filter-panel-title' }, t('filter.title')),
-            hasActiveFilters ? h('button', {
-              type: 'button', className: 'dfl-filter-clear',
-              onClick: () => { setCategory('all'); setSourceFilter('all'); setArchivedOnly(false) },
-            }, t('filter.clearAll')) : null),
-          h('div', { className: 'dfl-filter-column' },
-            h('div', { className: 'dfl-filter-section-title' }, t('filter.sourceSection')),
-            sources.map(key => filterOption('source', key, key === 'all' ? t('filter.sourceAll') : t(SOURCE_LABELS[key]), key === 'all' ? sourceCounts.total : sourceCounts.counts[key] || 0, sourceFilter === key))),
-          h('div', { className: 'dfl-filter-column is-child' },
-            h('div', { className: 'dfl-filter-section-title dfl-filter-child-title' },
-              h('span', null, t('filter.typeSection')),
-              h('span', { className: 'dfl-filter-parent' }, sourceFilter === 'all' ? t('filter.withinAllSources') : t('filter.within', { value: t(SOURCE_LABELS[sourceFilter]) }))),
-            categories.map(key => filterOption('category', key, key === 'all' ? t('filter.typeAll') : t(CATEGORY_LABELS[key]), key === 'all' ? categoryCounts.total : categoryCounts.counts[key] || 0, category === key))))
-
-          return h('div', { className: 'dfl-toolbar' },
-            h('div', { className: 'dfl-search-row' },
-              h('input', {
-                className: 'dfl-search',
-                type: 'search',
-                value: query,
-                placeholder: scope === 'history' && historyId === null ? t('history.search') : t('search.placeholder'),
-                'aria-label': scope === 'history' && historyId === null ? t('history.search') : t('search.placeholder'),
-                onChange: event => setQuery(event.target.value),
-              }),
-              scope === 'history' && historyId === null ? null : h('select', {
-                className: 'dfl-sort',
-                value: sort,
-                'aria-label': t('sort.label'),
-                onChange: event => setSort(event.target.value),
+          const filterPanel = () => filterMenu !== 'panel' ? null : ReactDOM.createPortal(
+            h('div', {
+              className: 'dfl-filter-popover dfl-filter-panel dfl-theme',
+              ...themeAttributes(preferences, scheme),
+              role: 'menu',
+              style: {
+                left: `${filterPos.left}px`,
+                top: `${filterPos.top}px`,
+                width: `${filterPos.width}px`,
+                maxHeight: `${filterPos.maxHeight || 340}px`,
               },
-              h('option', { value: 'time' }, t('sort.time')),
-              h('option', { value: 'name' }, t('sort.name')),
-              h('option', { value: 'type' }, t('sort.type'))),
-              scope === 'history' && historyId === null ? null : h('button', {
-                type: 'button', className: 'dfl-group-toggle',
-                title: groupMode === 'category' ? t('group.byProject') : t('group.byCategory'),
-                onClick: () => setGroupMode(value => value === 'category' ? 'project' : 'category'),
-              }, groupMode === 'category' ? t('group.byCategory') : t('group.byProject')),
-            ),
-            showFilters ? h('div', { className: 'dfl-filterbar' },
-              h('button', {
+            },
+            h('div', { className: 'dfl-filter-panel-head' },
+              h('span', { className: 'dfl-filter-panel-title' }, t('filter.title')),
+              hasAnyFilter ? h('button', {
                 type: 'button',
-                className: `dfl-filter-trigger dfl-filter-button${hasActiveFilters ? ' is-on' : ''}${filterMenu === 'panel' ? ' is-open' : ''}`,
+                className: 'dfl-filter-clear',
+                onClick: () => { setCategory('all'); setSourceFilter('all'); setArchivedOnly(false); setQuery('') },
+              }, t('filter.clearAll')) : null),
+            h('div', { className: 'dfl-filter-columns' },
+              h('div', { className: 'dfl-filter-column' },
+                h('div', { className: 'dfl-filter-section-title' }, t('filter.sourceSection')),
+                sources.map(key => filterOption('source', key, key === 'all' ? t('filter.sourceAll') : t(SOURCE_LABELS[key]), key === 'all' ? sourceCounts.total : sourceCounts.counts[key] || 0, sourceFilter === key))),
+              h('div', { className: 'dfl-filter-column is-child' },
+                h('div', { className: 'dfl-filter-section-title dfl-filter-child-title' },
+                  h('span', null, t('filter.typeSection')),
+                  h('span', { className: 'dfl-filter-parent' }, sourceFilter === 'all' ? t('filter.withinAllSources') : t('filter.within', { value: t(SOURCE_LABELS[sourceFilter]) }))),
+                categories.map(key => filterOption('category', key, key === 'all' ? t('filter.typeAll') : t(CATEGORY_LABELS[key]), key === 'all' ? categoryCounts.total : categoryCounts.counts[key] || 0, category === key))))),
+            document.body,
+          )
+
+          return h(React.Fragment, null,
+            h('div', { className: 'dfl-toolbar-row' },
+              h('div', { className: 'dfl-search-box' },
+                SearchIcon(13),
+                h('input', {
+                  className: 'dfl-search',
+                  type: 'search',
+                  value: query,
+                  placeholder: t('search.placeholder'),
+                  'aria-label': t('search.placeholder'),
+                  onChange: event => setQuery(event.target.value),
+                }),
+                query.length > 0 ? h('button', {
+                  type: 'button',
+                  className: 'dfl-search-clear',
+                  'aria-label': t('filter.clear'),
+                  title: t('filter.clear'),
+                  onClick: () => setQuery(''),
+                }, CloseIcon(10)) : null),
+              h('button', {
+                ref: filterBtnRef,
+                type: 'button',
+                className: `dfl-toolbar-pill-btn dfl-filter-trigger${activeFilterCount > 0 ? ' is-active' : ''}${filterMenu === 'panel' ? ' is-open' : ''}`,
                 'aria-expanded': filterMenu === 'panel',
                 'aria-haspopup': 'menu',
                 onClick: () => setFilterMenu(filterMenu === 'panel' ? null : 'panel'),
               },
-              h('span', { className: 'dfl-filter-button-text' }, t('filter.button')),
-              activeCount > 0 ? h('span', { className: 'dfl-filter-active-count' }, activeCount) : null,
-              h('span', { className: 'dfl-chevron' }, '▾')),
-              category !== 'all' ? activeTag('type', `${t('filter.typeLabel')} · ${t(CATEGORY_LABELS[category])}`, () => setCategory('all')) : null,
-              sourceFilter !== 'all' ? activeTag('source', `${t('filter.sourceKey')} · ${t(SOURCE_LABELS[sourceFilter])}`, () => setSourceFilter('all')) : null,
-              archivedCount > 0 || archivedOnly ? h('button', {
+              h('span', null, t('filter.button')),
+              activeFilterCount > 0 ? h('span', { className: 'dfl-toolbar-pill-badge' }, activeFilterCount) : null,
+              CaretDownIcon(10)),
+              h('button', {
                 type: 'button',
-                className: `dfl-filter-trigger dfl-archived-toggle${archivedOnly ? ' is-on' : ''}`,
+                className: `dfl-toolbar-pill-btn dfl-archived-toggle${archivedOnly ? ' is-active' : ''}`,
                 'aria-pressed': archivedOnly,
+                title: t('filter.archivedHint'),
                 onClick: () => setArchivedOnly(value => !value),
               },
-              h('span', { className: 'dfl-filter-key' }, t('filter.archived')),
-              h('span', { className: 'dfl-filter-count' }, archivedCount)) : null,
-              h('span', { className: 'dfl-filter-total' }, t('filter.files', { count: visibleFiles.length })),
-              filterPanel()) : null,
-          )
+              ArchiveIcon(12),
+              h('span', null, t('filter.archived')),
+              h('span', { className: 'dfl-toolbar-pill-badge' }, archivedCount)),
+              filterPanel()),
+            hasAnyFilter ? h('div', { className: 'dfl-active-filters' },
+              sourceFilter !== 'all' ? activeTag('source', `${t('filter.sourceKey')}: ${t(SOURCE_LABELS[sourceFilter])}`, () => setSourceFilter('all')) : null,
+              category !== 'all' ? activeTag('type', `${t('filter.typeLabel')}: ${t(CATEGORY_LABELS[category])}`, () => setCategory('all')) : null,
+              archivedOnly ? activeTag('archived', t('filter.archived'), () => setArchivedOnly(false)) : null,
+              query.trim().length > 0 ? activeTag('search', `"${query.trim()}"`, () => setQuery('')) : null,
+              h('button', {
+                type: 'button',
+                className: 'dfl-filter-clear-btn',
+                onClick: () => { setCategory('all'); setSourceFilter('all'); setArchivedOnly(false); setQuery('') },
+              }, t('filter.clearAll'))) : null)
         }
 
         function renderSelectionBar() {
           if (!selectMode) return null
           const count = selectedFiles.length
-          return h('div', { className: 'dfl-selectbar' },
-            h('span', { className: 'dfl-select-count' }, t('select.count', { count })),
-            h('button', { type: 'button', className: 'dfl-link', onClick: selectAll }, t('select.all')),
-            h('button', { type: 'button', className: 'dfl-link', onClick: clearSelection }, t('select.clear')),
-            h('span', { className: 'dfl-spacer' }),
-            h('button', {
-              type: 'button', className: 'dfl-button', disabled: count === 0,
-              onClick: () => insertReferences(selectedFiles, { absolute: true }),
-            }, t('action.addToInput')),
-            h('button', {
-              type: 'button', className: 'dfl-button', disabled: count === 0,
-              onClick: () => addPins(selectedFiles),
-            }, t('action.pin')),
-            h('button', {
-              type: 'button', className: 'dfl-button', disabled: count === 0 || archiving,
-              onClick: () => archiveFiles(selectedFiles),
-            }, archiving ? t('toast.archiving') : t('action.archive')),
-          )
+          return h('div', { className: 'dfl-composite-bar' },
+            h('div', { className: 'dfl-comp-left' },
+              h('button', { type: 'button', className: 'dfl-comp-btn', onClick: selectAll }, t('select.all')),
+              count > 0 ? h('button', { type: 'button', className: 'dfl-comp-btn', onClick: clearSelection }, t('select.clear')) : null,
+              h('span', { className: 'dfl-comp-count' }, t('select.count', { count }))),
+            h('div', { className: 'dfl-comp-actions' },
+              h('button', {
+                type: 'button', className: 'dfl-comp-btn', disabled: count === 0,
+                onClick: () => addPins(selectedFiles),
+              }, `★ ${t('action.pin')}`),
+              h('button', {
+                type: 'button', className: 'dfl-comp-btn', disabled: count === 0 || archiving,
+                onClick: () => archiveFiles(selectedFiles),
+              }, `📦 ${archiving ? t('toast.archiving') : t('action.archive')}`),
+              h('button', {
+                type: 'button', className: 'dfl-comp-btn', disabled: count === 0,
+                title: t('action.attachFilesHint'),
+                onClick: () => attachToComposer(selectedFiles),
+              }, `📎 ${t('action.attachFiles')}`),
+              h('button', {
+                type: 'button', className: 'dfl-comp-btn', disabled: count === 0,
+                onClick: () => copyReference(selectedFiles),
+              }, t('action.copyRef')),
+              h('button', {
+                type: 'button', className: 'dfl-comp-btn is-primary', disabled: count === 0,
+                onClick: () => insertReferences(selectedFiles, { absolute: true }),
+              }, t('action.addToInput'))))
         }
 
         function openContextMenu(file, event) {
@@ -1723,15 +2701,20 @@ window.__ModuleLoader__.load({
           const selectedNow = selected.has(rowKey)
           const isMenuOpen = contextMenu !== null && fileRowKey(contextMenu.file) === rowKey
           const previewable = file.missing !== true && canPanelPreview(file)
-          const context = scope === 'sent'
+          const canPinRow = file.isFolder !== true && (file.missing !== true || pinned)
+          const context = (scope === 'sent' || scope === 'pins') && groupMode !== 'project'
             ? [file.projectName, file.sessionTitle].filter(Boolean).join(' · ')
             : ''
+          const dirPart = file.rel && file.rel !== file.name
+            ? file.rel
+            : (file.dir || '')
           const meta = [
             context,
-            file.rel && file.rel !== file.name ? file.rel : '',
-            typeof file.size === 'number' && file.size > 0 ? formatBytes(file.size) : '',
             file.source !== 'pinned' ? formatTime(file.mtime) : '',
+            typeof file.size === 'number' && file.size > 0 ? formatBytes(file.size) : '',
+            dirPart,
           ].filter(Boolean).join(' · ')
+          const showSourceBadge = scope === 'session' || scope === 'pins' || file.source === 'delivered' || file.source === 'attachment'
           const openThis = () => {
             if (file.missing === true) { notify(t('toast.missing')); return }
             if (file.isFolder === true) { void openFolder(file); return }
@@ -1740,7 +2723,7 @@ window.__ModuleLoader__.load({
           }
           return h('div', { key: rowKey, className: 'dfl-item' },
             h('div', {
-              className: `dfl-row${selectedNow ? ' is-selected' : ''}${isMenuOpen ? ' is-open' : ''}${file.missing === true ? ' is-missing' : ''}`,
+              className: `dfl-row${selectedNow ? ' is-selected' : ''}${isMenuOpen ? ' is-open' : ''}${file.missing === true ? ' is-missing' : ''}${file.reference === true ? ' is-reference' : ''}${pinned ? ' is-pinned' : ''}`,
               role: 'button',
               tabIndex: 0,
               title: file.path,
@@ -1757,55 +2740,129 @@ window.__ModuleLoader__.load({
                 }
               },
             },
-            selectMode ? h('input', {
-              type: 'checkbox',
-              className: 'dfl-check',
-              checked: selectedNow,
-              'aria-label': t('select.row', { name: file.name }),
-              onClick: event => event.stopPropagation(),
-              onChange: event => toggleSelected(rowKey, event.target.checked),
-            }) : null,
-            h('div', { className: 'dfl-icon', 'data-cat': file.category }, extensionLabel(file.name)),
+            selectMode
+              ? h('input', {
+                type: 'checkbox',
+                className: 'dfl-check',
+                checked: selectedNow,
+                'aria-label': t('select.row', { name: file.name }),
+                onClick: event => event.stopPropagation(),
+                onChange: event => toggleSelected(rowKey, event.target.checked),
+              })
+              : canPinRow
+                ? h('button', {
+                  type: 'button',
+                  className: `dfl-star-btn${pinned ? ' is-pinned' : ''}`,
+                  title: pinned ? t('menu.unpin') : t('menu.pin'),
+                  'aria-label': pinned ? t('menu.unpin') : t('menu.pin'),
+                  'aria-pressed': pinned,
+                  onClick: event => {
+                    event.stopPropagation()
+                    void (pinned ? removePins([file]) : addPins([file]))
+                  },
+                }, StarIcon(pinned, 13))
+                : h('span', { className: 'dfl-star-spacer', 'aria-hidden': true }),
+            h('div', { className: 'dfl-icon', 'data-cat': file.category || categoryOf(file) }, file.isFolder === true ? 'DIR' : extensionLabel(file.name)),
             h('div', { className: 'dfl-main' },
               h('div', { className: 'dfl-name-line' },
                 h('span', { className: 'dfl-name' }, file.name),
-                file.source === 'delivered' ? h('span', { className: 'dfl-badge is-delivered' }, t('source.delivered')) : null,
-                file.isFolder === true ? h('span', { className: 'dfl-badge is-folder' }, t('filter.folder')) : null,
                 file.missing === true ? h('span', { className: 'dfl-badge is-missing' }, t('source.missing')) : null,
                 file.moved === true ? h('span', { className: 'dfl-badge is-moved' }, t('source.moved')) : null,
-                file.source === 'attachment' ? h('span', { className: 'dfl-badge is-user' }, t('source.attachment')) : null,
-                file.reference === true ? h('span', {
+                file.reference === true ? h('button', {
+                  type: 'button',
                   className: 'dfl-badge is-reference',
                   title: t('reference.trace'),
                   onClick: event => {
                     event.stopPropagation()
                     setTraceFile(file)
                   },
-                }, t('reference.badge')) : null,
-                file.archived === true ? h('span', { className: 'dfl-badge is-archived' }, t('source.archived')) : null,
-                pinned ? h('span', { className: 'dfl-badge is-pinned' }, t('source.pinned')) : null),
+                }, RefLinkIcon(9), h('span', null, t('reference.badge'))) : null,
+                showSourceBadge && file.source !== 'pinned' ? h('span', { className: `dfl-badge is-${file.source || 'recent'}` }, t('source.' + (file.source || 'workspace'))) : null,
+                file.projectName && (scope === 'sent' || scope === 'pins') && groupMode !== 'project' ? h('span', { className: 'dfl-badge is-proj' }, file.projectName) : null,
+                pinned && scope !== 'pins' ? h('span', { className: 'dfl-badge is-pinned' }, t('badge.antiCompaction')) : null,
+                file.archived === true ? h('span', { className: 'dfl-badge is-archived' }, t('source.archived')) : null),
               h('div', { className: 'dfl-meta' },
                 h('span', { className: 'dfl-meta-text' }, meta || t('source.' + file.source)),
                 file.description ? h('span', { className: 'dfl-desc' }, ` · ${file.description}`) : null)),
             h('div', { className: 'dfl-row-actions' },
+              file.missing !== true ? h(React.Fragment, null,
+                h('button', {
+                  type: 'button',
+                  className: 'dfl-row-act-btn',
+                  title: t('action.insertHint'),
+                  onClick: event => { event.stopPropagation(); void insertReferences([file], { absolute: true }) },
+                }, t('action.insertShort')),
+                h('button', {
+                  type: 'button',
+                  className: 'dfl-row-act-btn',
+                  title: t('action.copyRefHint'),
+                  onClick: event => { event.stopPropagation(); void copyReference([file]) },
+                }, t('action.copyRef'))) : null,
               h('button', {
-                type: 'button', className: 'dfl-icon-button',
-                title: file.isFolder === true ? t('action.folder') : previewable ? t('action.previewInline') : t('action.preview'),
-                'aria-label': file.isFolder === true ? t('action.folder') : previewable ? t('action.previewInline') : t('action.preview'),
-                onClick: event => { event.stopPropagation(); openThis() },
-              }, '↗'),
-              h('button', {
-                type: 'button', className: 'dfl-open-button',
-                title: t('action.menu'), 'aria-label': t('action.menu'),
+                type: 'button',
+                className: 'dfl-open-button',
+                title: t('action.menu'),
+                'aria-label': t('action.menu'),
                 'aria-expanded': isMenuOpen,
                 onClick: event => openContextMenu(file, event),
-              }, h('span', null, t('action.menu')), h('span', { className: 'dfl-chevron' }, '▾')))),
-            null)
+              }, h('span', null, file.missing === true ? t('action.actions') : t('action.menu')), CaretDownIcon(11)))))
+        }
+
+        function renderLoadingComfort(modeKey, elapsedMs, file = null) {
+          const safeElapsed = Math.max(0, Number(elapsedMs) || 0)
+          const secStr = (safeElapsed / 1000).toFixed(1)
+          const baselineMs = Math.max(800, Number(scopeDurationRef.current[modeKey] || 1800))
+          const estLow = Math.max(1, Math.round(baselineMs * 0.8 / 1000))
+          const estHigh = Math.max(estLow + 1, Math.ceil((baselineMs * 1.35) / 1000))
+          const remainSec = Math.max(1, Math.ceil((baselineMs * 1.15 - safeElapsed) / 1000))
+          const overBudget = safeElapsed > baselineMs * 1.15
+          const stage = safeElapsed >= 6000 ? 'long' : safeElapsed >= 2500 ? 'mid' : 'early'
+
+          let headlineKey = 'loading'
+          if (modeKey === 'viewer') {
+            if (stage === 'long') headlineKey = 'loading.comfort.long'
+            else if (file && isOfficeFile(file)) headlineKey = 'viewer.converting'
+            else if (file && isPdfFile(file)) headlineKey = 'viewer.rendering'
+            else headlineKey = 'viewer.loading'
+          } else if (stage === 'long') {
+            headlineKey = 'loading.comfort.long'
+          } else if (stage === 'mid') {
+            headlineKey = modeKey === 'project'
+              ? 'loading.comfort.projectMid'
+              : modeKey === 'sent'
+                ? 'loading.comfort.sentMid'
+                : 'loading.comfort.sessionMid'
+          } else {
+            headlineKey = modeKey === 'project'
+              ? 'loading.comfort.project'
+              : modeKey === 'sent'
+                ? 'loading.comfort.sent'
+                : 'loading.comfort.session'
+          }
+
+          const etaLine = overBudget
+            ? t('loading.etaFinishing', { elapsed: secStr })
+            : t('loading.eta', { elapsed: secStr, low: estLow, high: estHigh, remain: remainSec })
+          const pct = overBudget
+            ? Math.min(94, 78 + Math.round((safeElapsed - baselineMs * 1.15) / 800))
+            : Math.min(82, Math.max(12, Math.round((safeElapsed / Math.max(baselineMs, 900)) * 78)))
+
+          return h('div', {
+            className: modeKey === 'viewer' ? 'dfl-viewer-status dfl-loading-card' : 'dfl-empty dfl-loading-card',
+            role: 'status',
+          },
+          h('div', { className: 'dfl-loading-head' },
+            h('span', { className: 'dfl-spinner', 'aria-hidden': true }),
+            h('span', { className: 'dfl-loading-title' }, t(headlineKey))),
+          h('div', { className: 'dfl-loading-track', 'aria-hidden': true },
+            h('div', { className: 'dfl-loading-fill', style: { width: `${pct}%` } })),
+          h('p', { className: 'dfl-loading-eta' }, etaLine),
+          h('p', { className: 'dfl-empty-text' }, t('loading.comfort.hint')))
         }
 
         function renderFileList() {
           if (loading && baseFiles.length === 0) {
-            return h('div', { className: 'dfl-empty', role: 'status' }, h('span', { className: 'dfl-spinner', 'aria-hidden': true }), t('loading'))
+            return renderLoadingComfort(inventoryScope, loadElapsedMs)
           }
           if (error) {
             return h('div', { className: 'dfl-empty' },
@@ -1814,45 +2871,62 @@ window.__ModuleLoader__.load({
               h('button', { type: 'button', className: 'dfl-button', onClick: refresh }, t('error.retry')))
           }
           if (visibleFiles.length === 0) {
-            const key = query.trim().length > 0 || category !== 'all' || sourceFilter !== 'all' || archivedOnly
+            const hasActiveFilter = query.trim().length > 0 || category !== 'all' || sourceFilter !== 'all' || archivedOnly
+            const key = hasActiveFilter
               ? 'empty.filtered'
               : scope === 'pins' ? 'empty.pins' : scope === 'sent' ? 'empty.sent' : scope === 'project' ? 'empty.project' : 'empty.session'
+            const stats = scope === 'sent' ? sentScopeStats : scope === 'pins' ? pinScopeStats : null
+            const canOfferQuickExpand = !hasActiveFilter && stats !== null && regionTarget.kind !== 'all' && stats.total > 0
             return h('div', { className: 'dfl-empty' },
               h('p', { className: 'dfl-empty-title' }, t('empty.title')),
-              h('p', { className: 'dfl-empty-text' }, t(key)))
+              h('p', { className: 'dfl-empty-text' }, t(key)),
+              canOfferQuickExpand ? h('div', { className: 'dfl-empty-actions' },
+                cwd && regionTarget.kind === 'current-session' && stats.curProjectCount > 0 ? h('button', {
+                  type: 'button',
+                  className: 'dfl-button',
+                  onClick: () => selectRegionTarget({ kind: 'current-project' }),
+                }, t('scope.showProject', { count: stats.curProjectCount })) : null,
+                h('button', {
+                  type: 'button',
+                  className: 'dfl-button is-primary',
+                  onClick: () => selectRegionTarget({ kind: 'all' }),
+                }, t('scope.showAll', { count: stats.total }))) : null)
           }
           const forceOpenGroups = query.trim().length > 0 || category !== 'all' || sourceFilter !== 'all' || archivedOnly
           if (categoryGroups !== null) {
             return h('div', { className: 'dfl-list dfl-grouped-list' }, categoryGroups.map(group => {
               const key = group.key
-              const open = forceOpenGroups || expandedCategories.has(key)
-              return h('div', { key, className: 'dfl-category-group' },
+              const open = forceOpenGroups || !collapsedCategories.has(key)
+              return h('div', { key, className: `dfl-category-group${open ? ' is-open' : ''}` },
                 h('button', {
                   type: 'button',
                   className: 'dfl-category-group-head',
                   'aria-expanded': open,
-                  onClick: () => setExpandedCategories(previous => {
+                  onClick: () => setCollapsedCategories(previous => {
                     const next = new Set(previous)
                     if (next.has(key)) next.delete(key)
                     else next.add(key)
                     return next
                   }),
                 },
-                h('span', { className: 'dfl-group-chevron', 'aria-hidden': true }, open ? '▾' : '▸'),
+                CaretDownIcon(11),
                 h('span', { className: 'dfl-group-name' }, t(CATEGORY_LABELS[key] || 'filter.other')),
-                h('span', { className: 'dfl-group-count' }, `${group.files.length}`)),
-                open ? group.files.map(renderRow) : null)
+                h('span', { className: 'dfl-group-count' }, `(${group.files.length})`)),
+                open ? h('div', { className: 'dfl-group-rows' }, group.files.map(renderRow)) : null)
             }))
           }
           if (fileGroups !== null) {
-            const renderSessionGroup = (projectKey, session, singleSession) => {
+            const hasAnyCurProj = fileGroups.some(item => item.isCurrent === true)
+            const renderSessionGroup = (projectKey, session, singleSession, sIdx, hasCurSess) => {
               const sessionKey = `${projectKey}:session:${session.key}`
               const sessionOpen = expandedSessions.get(sessionKey) ?? (
                 forceOpenGroups
                 || preferences?.collapseGroups === false
-                || (scope === 'project' && singleSession)
+                || session.isCurrent === true
+                || singleSession
+                || (!hasCurSess && sIdx === 0)
               )
-              return h('div', { key: sessionKey, className: 'dfl-file-session' },
+              return h('div', { key: sessionKey, className: `dfl-file-session${sessionOpen ? ' is-open' : ''}` },
                 h('button', {
                   type: 'button',
                   className: 'dfl-group-session-head',
@@ -1863,27 +2937,25 @@ window.__ModuleLoader__.load({
                     return next
                   }),
                 },
-                h('span', { className: 'dfl-group-chevron', 'aria-hidden': true }, sessionOpen ? '▾' : '▸'),
+                ChevronRightIcon(11, `dfl-group-caret${sessionOpen ? ' is-open' : ''}`),
+                session.key === 'workspace' ? FolderIcon(12) : ChatIcon(12),
                 h('span', { className: 'dfl-group-session-name' }, session.name),
+                session.isCurrent === true ? h('span', { className: 'dfl-group-badge' }, t('scope.current')) : null,
                 h('span', { className: 'dfl-group-count' }, `${session.files.length}`)),
-                sessionOpen ? session.files.map(renderRow) : null)
+                sessionOpen ? h('div', { className: 'dfl-group-rows' }, session.files.map(renderRow)) : null)
             }
-            if (scope === 'project' && fileGroups.length === 1) {
-              const onlyProject = fileGroups[0]
-              const projectKey = `files:project:${onlyProject.key}`
-              const singleSession = onlyProject.sessions.length === 1
-              return h('div', { className: 'dfl-list dfl-grouped-list' },
-                onlyProject.sessions.map(session => renderSessionGroup(projectKey, session, singleSession)))
-            }
-            return h('div', { className: 'dfl-list dfl-grouped-list' }, fileGroups.map(project => {
+            return h('div', { className: 'dfl-list dfl-grouped-list' }, fileGroups.map((project, idx) => {
               const projectKey = `files:project:${project.key}`
               const projectOpen = expandedProjects.get(projectKey) ?? (
                 forceOpenGroups
                 || preferences?.collapseGroups === false
-                || scope === 'project'
+                || project.isCurrent === true
+                || fileGroups.length === 1
+                || (!hasAnyCurProj && idx === 0)
               )
               const singleSession = project.sessions.length === 1
-              return h('div', { key: projectKey, className: 'dfl-file-group' },
+              const hasCurSess = project.sessions.some(item => item.isCurrent === true)
+              return h('div', { key: projectKey, className: `dfl-file-group${projectOpen ? ' is-open' : ''}` },
                 h('button', {
                   type: 'button',
                   className: 'dfl-group-project-head',
@@ -1894,83 +2966,28 @@ window.__ModuleLoader__.load({
                     return next
                   }),
                 },
-                h('span', { className: 'dfl-group-chevron', 'aria-hidden': true }, projectOpen ? '▾' : '▸'),
+                ChevronRightIcon(12, `dfl-group-caret${projectOpen ? ' is-open' : ''}`),
+                FolderIcon(13),
                 h('span', { className: 'dfl-group-name' }, project.name),
-                h('span', { className: 'dfl-group-count' }, `${project.files}`),
-                h('span', { className: 'dfl-group-path', title: project.path }, project.path)),
-                projectOpen ? project.sessions.map(session => renderSessionGroup(projectKey, session, singleSession)) : null)
+                project.isCurrent === true ? h('span', { className: 'dfl-group-badge' }, t('scope.current')) : null,
+                h('span', { className: 'dfl-group-path', title: project.path }, project.path),
+                h('span', { className: 'dfl-group-count' }, `${project.files}`)),
+                projectOpen ? h('div', { className: 'dfl-group-sessions' }, project.sessions.map((session, sIdx) => renderSessionGroup(projectKey, session, singleSession, sIdx, hasCurSess))) : null)
             }))
           }
           return h('div', { className: 'dfl-list' }, visibleFiles.map(renderRow))
         }
 
-        function renderHistoryChooser() {
-          if (historyOptions.length === 0) {
-            return h('div', { className: 'dfl-empty' },
-              h('p', { className: 'dfl-empty-title' }, t('history.emptyTitle')),
-              h('p', { className: 'dfl-empty-text' }, query.trim().length > 0 ? t('empty.filtered') : t('empty.history')))
-          }
-          return h('div', { className: 'dfl-list' },
-            historyGroups.map(group => {
-              const open = expandedProjects.get(group.key) ?? (query.trim().length > 0 || preferences?.collapseGroups === false)
-              return h('div', { key: group.key || '__none__', className: 'dfl-project' },
-                h('button', {
-                  type: 'button',
-                  className: 'dfl-project-head',
-                  'aria-expanded': open,
-                  onClick: () => setExpandedProjects(previous => {
-                    const next = new Map(previous)
-                    next.set(group.key, !open)
-                    return next
-                  }),
-                },
-                h('span', { className: 'dfl-project-chevron', 'aria-hidden': true }, open ? '▾' : '▸'),
-                h('span', { className: 'dfl-project-name' }, group.name),
-                h('span', { className: 'dfl-project-count' }, `${group.sessions.length}`),
-                h('span', { className: 'dfl-project-path', title: group.cwd || '' }, group.cwd || '')),
-                open ? group.sessions.map(row => h('button', {
-                  key: row.id,
-                  type: 'button',
-                  className: 'dfl-session',
-                  onClick: () => {
-                    setHistoryId(row.id)
-                    setQuery('')
-                    setCategory('all')
-                    setSourceFilter('all')
-                    setArchivedOnly(false)
-                    setFilterMenu(null)
-                    setContextMenu(null)
-                  },
-                },
-                h('span', { className: 'dfl-session-title' }, row.displayTitle || row.title || row.id),
-                h('span', { className: 'dfl-session-meta' },
-                  h('span', { className: 'dfl-session-project' }, row.cwd ? baseName(row.cwd) : t('history.noProject')),
-                  h('span', { className: 'dfl-session-time' }, formatTime(row.updatedAt))))) : null)
-            }))
-        }
-
-        function renderBody() {
-          if (scope === 'history' && historyId === null) return renderHistoryChooser()
-          return renderFileList()
-        }
-
         function renderFooter() {
-          const choosingHistory = scope === 'history' && historyId === null
-          const total = scope === 'pins' ? pins.length : (currentData ? currentData.files.length : 0)
-          const truncated = currentData && currentData.truncated
+          const total = baseFiles.length
+          const truncated = currentData && currentData.truncated && scope !== 'pins' && scope !== 'sent'
+          const footPathText = regionTarget.kind === 'all' && (scope === 'sent' || scope === 'pins')
+            ? t('scope.allRegions')
+            : (inventoryCwd || t('foot.noWorkspace'))
           return h('div', { className: 'dfl-foot' },
             h('span', { className: 'dfl-foot-count' },
-              choosingHistory
-                ? t('history.choose')
-                : t('foot.count', { count: visibleFiles.length, total }) + (truncated ? t('foot.truncated') : '')),
-            choosingHistory
-              ? h('span', { className: 'dfl-foot-path' }, t('history.count', { count: historyOptions.length }))
-              : (historyId !== null && scope === 'history'
-                ? h('button', {
-                  type: 'button', className: 'dfl-link dfl-foot-back',
-                  onClick: () => { setHistoryId(null); setData(null); setQuery(''); setCategory('all'); setSourceFilter('all'); setArchivedOnly(false) },
-                }, `← ${t('history.back')}`)
-                : h('span', { className: 'dfl-foot-path', title: inventoryCwd || '' }, inventoryCwd || t('foot.noWorkspace'))))
+              t('foot.count', { count: visibleFiles.length, total }) + (truncated ? t('foot.truncated') : '')),
+            h('span', { className: 'dfl-foot-path', title: footPathText }, footPathText))
         }
 
         function renderViewer() {
@@ -1989,75 +3006,85 @@ window.__ModuleLoader__.load({
             role: 'dialog',
             'aria-modal': true,
             'aria-label': t('viewer.title'),
-            style: {
-              background: 'var(--dsw-alias-bg-base)',
-              display: 'flex', flexDirection: 'column',
-            },
             onContextMenu: event => {
               event.preventDefault()
               setContextMenu({ file, x: event.clientX, y: event.clientY })
             },
           },
-            h('div', { className: 'dfl-viewer-head', style: { background: 'var(--dsw-alias-bg-base)' } },
+            h('div', { className: 'dfl-viewer-head' },
               h('div', { className: 'dfl-viewer-title', title: file.path },
+                h('div', { className: 'dfl-icon', 'data-cat': file.category }, file.isFolder === true ? FolderIcon(12) : extensionLabel(file.name)),
                 h('span', { className: 'dfl-viewer-name' }, file.name),
                 h('span', { className: 'dfl-viewer-count' }, `${viewer.index + 1} / ${count}`)),
               h('div', { className: 'dfl-viewer-actions' },
                 h('button', {
-                  type: 'button', className: 'dfl-viewer-button', disabled: count < 2,
-                  title: t('viewer.previous'), 'aria-label': t('viewer.previous'),
-                  onClick: () => moveViewer(-1),
-                }, '‹'),
+                  type: 'button',
+                  className: 'dfl-viewer-link',
+                  title: t('action.insertHint'),
+                  onClick: () => void insertReferences([file], { absolute: true }),
+                }, h('span', null, t('action.insertShort'))),
                 h('button', {
-                  type: 'button', className: 'dfl-viewer-button', disabled: count < 2,
-                  title: t('viewer.next'), 'aria-label': t('viewer.next'),
-                  onClick: () => moveViewer(1),
-                }, '›'),
+                  type: 'button',
+                  className: 'dfl-viewer-link',
+                  title: t('action.copyRefHint'),
+                  onClick: () => void copyReference([file]),
+                }, h('span', null, t('action.copyRef'))),
+                current.status !== 'pages' ? h('button', {
+                  type: 'button',
+                  className: 'dfl-viewer-link',
+                  onClick: () => preview(file),
+                }, ExternalArrowIcon(12), h('span', null, t('viewer.openSidebar'))) : null,
+                h('div', { className: 'dfl-viewer-seg' },
+                  h('button', {
+                    type: 'button', className: 'dfl-viewer-button', disabled: count < 2,
+                    title: t('viewer.previous'), 'aria-label': t('viewer.previous'),
+                    onClick: () => moveViewer(-1),
+                  }, PrevIcon(14)),
+                  h('button', {
+                    type: 'button', className: 'dfl-viewer-button', disabled: count < 2,
+                    title: t('viewer.next'), 'aria-label': t('viewer.next'),
+                    onClick: () => moveViewer(1),
+                  }, NextIcon(14))),
                 h('button', {
-                  type: 'button', className: 'dfl-viewer-button', title: t('viewer.close'), 'aria-label': t('viewer.close'),
+                  type: 'button', className: 'dfl-viewer-button is-close', title: t('viewer.close'), 'aria-label': t('viewer.close'),
                   onClick: () => setViewer(null),
-                }, '×'))),
+                }, CloseIcon(14)))),
             current.status === 'pages' ? h('div', { className: 'dfl-viewer-toolbar' },
-              h('button', {
-                type: 'button', className: 'dfl-viewer-button', disabled: current.page <= 0,
-                title: t('viewer.previousPage'), 'aria-label': t('viewer.previousPage'),
-                onClick: () => goViewerPage(-1),
-              }, '‹'),
-              h('span', { className: 'dfl-viewer-pagecount' }, `${current.page + 1} / ${current.totalPages}`),
-              h('button', {
-                type: 'button', className: 'dfl-viewer-button', disabled: current.page >= current.pages.length - 1,
-                title: t('viewer.nextPage'), 'aria-label': t('viewer.nextPage'),
-                onClick: () => goViewerPage(1),
-              }, '›'),
-              h('span', { className: 'dfl-viewer-sep' }),
-              h('button', {
-                type: 'button', className: 'dfl-viewer-button', title: t('viewer.zoomOut'), 'aria-label': t('viewer.zoomOut'),
-                onClick: () => zoomViewer(-0.25),
-              }, '−'),
-              h('button', {
-                type: 'button', className: 'dfl-viewer-fit', title: t('viewer.fitWidth'), 'aria-pressed': current.fit,
-                onClick: toggleViewerFit,
-              }, current.fit ? t('viewer.fitWidth') : `${Math.round(current.zoom * 100)}%`),
-              h('button', {
-                type: 'button', className: 'dfl-viewer-button', title: t('viewer.zoomIn'), 'aria-label': t('viewer.zoomIn'),
-                onClick: () => zoomViewer(0.25),
-              }, '+'),
+              h('div', { className: 'dfl-viewer-seg' },
+                h('button', {
+                  type: 'button', className: 'dfl-viewer-button', disabled: current.page <= 0,
+                  title: t('viewer.previousPage'), 'aria-label': t('viewer.previousPage'),
+                  onClick: () => goViewerPage(-1),
+                }, PrevIcon(13)),
+                h('span', { className: 'dfl-viewer-pagecount' }, `${current.page + 1} / ${current.totalPages}`),
+                h('button', {
+                  type: 'button', className: 'dfl-viewer-button', disabled: current.page >= current.pages.length - 1,
+                  title: t('viewer.nextPage'), 'aria-label': t('viewer.nextPage'),
+                  onClick: () => goViewerPage(1),
+                }, NextIcon(13))),
+              h('div', { className: 'dfl-viewer-seg' },
+                h('button', {
+                  type: 'button', className: 'dfl-viewer-button', title: t('viewer.zoomOut'), 'aria-label': t('viewer.zoomOut'),
+                  onClick: () => zoomViewer(-0.25),
+                }, '−'),
+                h('button', {
+                  type: 'button', className: 'dfl-viewer-fit', title: t('viewer.fitWidth'), 'aria-pressed': current.fit,
+                  onClick: toggleViewerFit,
+                }, current.fit ? t('viewer.fitWidth') : `${Math.round(current.zoom * 100)}%`),
+                h('button', {
+                  type: 'button', className: 'dfl-viewer-button', title: t('viewer.zoomIn'), 'aria-label': t('viewer.zoomIn'),
+                  onClick: () => zoomViewer(0.25),
+                }, '+')),
               h('button', {
                 type: 'button', className: 'dfl-viewer-link',
                 onClick: () => preview(file),
-              }, t('viewer.openSidebar')),
+              }, ExternalArrowIcon(12), h('span', null, t('viewer.openSidebar'))),
               current.truncated ? h('span', { className: 'dfl-viewer-note' }, t('viewer.truncated', { count: current.pages?.length || 0 })) : null) : null,
             h('div', {
-              className: 'dfl-viewer-body',
-              style: {
-                flex: 1, minHeight: 0, background: 'var(--dsw-alias-bg-base)',
-                position: 'relative', zIndex: 1,
-              },
+              className: `dfl-viewer-body${current.status === 'pages' || current.status === 'image' ? ' is-stage' : ''}`,
             },
               current.status === 'loading'
-                ? h('div', { className: 'dfl-viewer-status' },
-                  h('span', { className: 'dfl-spinner', 'aria-hidden': true }),
-                  t(isOfficeFile(file) ? 'viewer.converting' : isPdfFile(file) ? 'viewer.rendering' : 'viewer.loading'))
+                ? renderLoadingComfort('viewer', loadElapsedMs, file)
                 : current.status === 'error'
                   ? h('div', { className: 'dfl-viewer-status' },
                     h('p', { className: 'dfl-empty-title' }, t('viewer.failed')),
@@ -2081,17 +3108,18 @@ window.__ModuleLoader__.load({
                     h('img', { src: page.url, alt: `${file.name} ${index + 1}`, draggable: false }),
                     h('span', { className: 'dfl-pdf-page-number' }, String(index + 1)))))
                     : current.status === 'image'
-                      ? h('img', {
-                        className: 'dfl-viewer-image', src: current.url, alt: file.name,
-                        onError: () => setViewerState({ status: 'error', error: t('viewer.failed'), file }),
-                      })
+                      ? h('div', { className: 'dfl-image-stage' },
+                        h('img', {
+                          className: 'dfl-viewer-image', src: current.url, alt: file.name,
+                          onError: () => setViewerState({ status: 'error', error: t('viewer.failed'), file }),
+                        }))
                       : current.status === 'text'
                         ? h(React.Fragment, null,
                           current.truncated ? h('div', { key: 'banner', className: 'dfl-viewer-text-banner' }, t('viewer.textTruncated')) : null,
                           h('pre', { key: 'text', className: 'dfl-viewer-text' }, current.text))
                         : null),
-            h('div', { className: 'dfl-viewer-foot', style: { background: 'var(--dsw-alias-bg-base)' } },
-              h('span', null, t('viewer.hint')),
+            h('div', { className: 'dfl-viewer-foot' },
+              h('span', { className: 'dfl-viewer-hint' }, t('viewer.hint')),
               h('span', { className: 'dfl-viewer-path', title: file.path }, file.path)))), document.body)
         }
 
@@ -2132,10 +3160,11 @@ window.__ModuleLoader__.load({
             !isFolder && !isMissing && platform === 'win32' ? item('openAs', t('menu.openAs'), () => openAs(file)) : null,
           ].filter(Boolean)
           const actionGroup = [
-            item('copyPath', t('menu.copyPath'), () => copyPath(file)),
-            item('copyRef', t('menu.copyRef'), () => copyReference([file])),
-            !isFolder && !isMissing && isImageFile(file) ? item('copyImage', t('menu.copyImage'), () => copyImageFile(file)) : null,
             item('copyAttach', t('menu.attach'), () => insertReferences([file], { absolute: true })),
+            !isFolder && !isMissing ? item('dropAttach', `📎 ${t('action.attachFiles')}`, () => attachToComposer([file])) : null,
+            item('copyRef', t('menu.copyRef'), () => copyReference([file])),
+            item('copyPath', t('menu.copyPath'), () => copyPath(file)),
+            !isFolder && !isMissing && isImageFile(file) ? item('copyImage', t('menu.copyImage'), () => copyImageFile(file)) : null,
             file.reference === true ? item('trace', t('menu.trace'), () => setTraceFile(file)) : null,
             !isFolder && !isMissing ? item('pin', pinned ? t('menu.unpin') : t('menu.pin'), () => pinned ? removePins([file]) : addPins([file])) : null,
             !isFolder && !isMissing ? item('archive', t('menu.archive'), () => archiveFiles([file])) : null,
@@ -2167,20 +3196,25 @@ window.__ModuleLoader__.load({
             },
           },
           h('div', { className: 'dfl-context-head' },
-            h('div', { className: 'dfl-context-name', title: file.path }, file.name),
-            h('div', { className: 'dfl-context-path', title: file.path }, file.path),
+            h('div', { className: 'dfl-context-head-row' },
+              h('div', { className: 'dfl-icon', 'data-cat': file.category }, file.isFolder === true ? FolderIcon(12) : extensionLabel(file.name)),
+              h('div', { className: 'dfl-context-head-meta' },
+                h('div', { className: 'dfl-context-name', title: file.path }, file.name),
+                h('div', { className: 'dfl-context-path', title: file.path }, file.path))),
             isMissing ? h('div', { className: 'dfl-context-note' }, t('source.missingHint')) : null),
           primaryGroup.length > 0 ? h('div', { className: 'dfl-context-group' }, primaryGroup) : null,
           !isFolder && !isMissing ? h('div', { className: 'dfl-context-group' },
             h('div', { className: 'dfl-context-label' }, t('menu.apps')),
-            cached && cached.loading ? h('div', { className: 'dfl-context-note' }, t('menu.detecting')) : null,
+            !cached || cached.loading ? h('div', { className: 'dfl-context-note' }, t('menu.detecting')) : null,
             apps.map(app => h('button', {
               key: app.id,
               type: 'button',
               className: 'dfl-menu-item',
-              onClick: action(() => openNative(file, app.id)),
+              onClick: action(() => openNative(file, app)),
             }, h('span', { className: 'dfl-app-name' }, app.name || app.id), app.default ? h('span', { className: 'dfl-app-default' }, t('menu.defaultSuffix')) : null)),
-            !cached || cached.loading || apps.length === 0 ? h('div', { className: 'dfl-context-note' }, t('menu.noApps')) : null) : null,
+            cached && !cached.loading && apps.length === 0
+              ? h('div', { className: 'dfl-context-note' }, t(cached.hostOutdated ? 'menu.hostOutdated' : 'menu.noApps'))
+              : null) : null,
           actionGroup.length > 0 ? h('div', { className: 'dfl-context-group' }, actionGroup) : null,
           isMissing ? h('div', { className: 'dfl-context-group' },
             item('forget', t('menu.forget'), () => forgetMissing(file))) : null,
@@ -2197,10 +3231,22 @@ window.__ModuleLoader__.load({
             onMouseDown: event => { if (event.target === event.currentTarget) setPendingDelete(null) },
           },
           h('div', { className: 'dfl-confirm-card', role: 'dialog', 'aria-modal': true, 'aria-label': t('delete.title') },
-            h('div', { className: 'dfl-confirm-title' }, t('delete.title')),
-            h('div', { className: 'dfl-confirm-name', title: file.path }, file.name),
-            h('p', { className: 'dfl-confirm-text' }, t('delete.message')),
-            file.source === 'attachment' ? h('p', { className: 'dfl-confirm-warning' }, t('delete.attachmentWarning')) : null,
+            h('div', { className: 'dfl-modal-head' },
+              h('div', { className: 'dfl-modal-title-wrap' },
+                h('span', { className: 'dfl-modal-danger-icon' }, WarningIcon(15)),
+                h('span', { className: 'dfl-confirm-title' }, t('delete.title'))),
+              h('button', {
+                type: 'button', className: 'dfl-modal-close',
+                'aria-label': t('delete.cancel'), onClick: () => setPendingDelete(null),
+              }, CloseIcon(13))),
+            h('div', { className: 'dfl-modal-body' },
+              h('div', { className: 'dfl-confirm-file-pill', title: file.path },
+                h('div', { className: 'dfl-icon', 'data-cat': file.category }, file.isFolder === true ? FolderIcon(12) : extensionLabel(file.name)),
+                h('div', { className: 'dfl-confirm-file-info' },
+                  h('div', { className: 'dfl-confirm-name' }, file.name),
+                  h('div', { className: 'dfl-confirm-path' }, file.path))),
+              h('p', { className: 'dfl-confirm-text' }, t('delete.message')),
+              file.source === 'attachment' ? h('p', { className: 'dfl-confirm-warning' }, t('delete.attachmentWarning')) : null),
             h('div', { className: 'dfl-confirm-actions' },
               h('button', { type: 'button', className: 'dfl-button', onClick: () => setPendingDelete(null) }, t('delete.cancel')),
               h('button', { type: 'button', className: 'dfl-button is-danger', onClick: () => void confirmDelete() }, t('delete.confirm'))),
@@ -2236,14 +3282,14 @@ window.__ModuleLoader__.load({
           ), document.body)
         }
 
-        return h('div', { className: 'dfl-root dfl-theme', ...themeAttributes(preferences, scheme) },
+        return h('div', { className: `dfl-root dfl-theme${selectMode ? ' is-selecting' : ''}`, ...themeAttributes(preferences, scheme) },
+          renderScopeBar(),
           renderHeader(),
-          renderContextBar(),
-          renderScopeTabs(),
+          renderRegionPills(),
           renderCategoryTabs(),
           renderToolbar(),
+          h('div', { className: 'dfl-body' }, renderFileList()),
           renderSelectionBar(),
-          h('div', { className: 'dfl-body' }, renderBody()),
           renderFooter(),
           pinsError && scope === 'pins' ? h('div', { className: 'dfl-warning', role: 'alert' }, pinsError) : null,
           toast !== null ? h('div', { className: 'dfl-toast', role: 'status' }, toast.text) : null,
@@ -2641,50 +3687,93 @@ window.__ModuleLoader__.load({
       'scope.label': '文件范围',
       'scope.session': '当前对话',
       'scope.sent': '我发送的',
-      'scope.sentTitle': '我发送的 · 所有项目与对话',
+      'scope.sentTitle': '我发送的 · 全项目与对话',
       'scope.project': '当前项目',
       'scope.pins': '收藏',
+      'scope.pinsTitle': '★ 收藏保留清单（防上下文压缩）',
       'scope.history': '历史对话',
+      'scope.convKind': '对话',
+      'scope.historyKind': '历史',
+      'scope.historyProjKind': '历史项目',
+      'scope.allKind': '全部',
+      'scope.sentAllKind': '全项目',
+      'scope.allRegions': '全部项目与对话',
+      'scope.noWorkspaceShort': '无工作区目录',
+      'scope.sentGroupTitle': '我发送的 · 范围切换',
+      'scope.pinsGroupTitle': '★ 收藏保留 · 范围切换',
+      'scope.sentTreeTitle': '按项目与对话隔离筛选',
+      'scope.pinsTreeTitle': '按项目与对话隔离筛选',
+      'scope.sentAllOption': '全部项目与对话（按项目→对话分类）',
+      'scope.pinsAllOption': '全部收藏清单',
+      'scope.projectGroupTitle': '工作区项目目录',
+      'scope.projStat': '{count} 项目',
+      'scope.regionStripLabel': '范围',
+      'scope.showProject': '查看当前项目 ({count})',
+      'scope.showAll': '查看全部项目 ({count})',
+      'scope.current': '当前',
+      'scope.currentSessionGroup': '当前对话与工作区',
+      'scope.isolationHint': '根据下方选中标签动态切换隔离范围：支持按对话、项目或全项目分类查看',
+      'scope.sessionCount': '{count} 对话',
+      'tab.session': '本次产出',
+      'tab.sent': '我发送的',
+      'tab.pinned': '★ 收藏',
+      'tab.project': '当前项目',
       'action.refresh': '刷新',
       'action.select': '选择',
-      'action.done': '完成',
+      'action.done': '退出',
+      'action.backCurrent': '返回当前',
+      'action.backCurrentHint': '切回当前正在进行的对话',
       'action.preview': '在侧边栏预览',
       'action.previewInline': '在面板内预览',
       'action.menu': '打开方式',
+      'action.actions': '操作',
       'action.folder': '在资源管理器中打开',
       'action.addToInput': '插入引用',
+      'action.insertShort': '插入',
+      'action.insertHint': '直接将 @ 引用插入到对话输入框',
+      'action.attachFiles': '作为附件',
+      'action.attachFilesHint': '作为真实附件拖入输入框（大文件/目录自动转为 @ 引用）',
       'action.pin': '收藏',
       'action.unpin': '取消收藏',
       'action.archive': '归档',
       'action.copyPath': '复制路径',
       'action.copyRef': '复制引用',
-      'search.placeholder': '搜索文件名、路径或说明',
+      'action.copyRefHint': '复制 @ 引用文本到剪贴板',
+      'search.placeholder': '搜索文件名、路径、后缀或类型...',
       'history.search': '搜索历史对话',
       'sort.label': '排序',
-      'sort.time': '按时间',
-      'sort.name': '按名称',
-      'sort.type': '按类型',
+      'sort.time': '时间↓',
+      'sort.timeAsc': '时间↑',
+      'sort.name': '名称',
+      'sort.type': '类型',
       'group.unknown': '未知项目',
+      'group.standalone': '独立对话（无工作区）',
       'group.workspace': '工作区文件',
       'group.untitled': '未命名会话',
       'filter.label': '类型筛选',
       'filter.button': '筛选',
       'filter.title': '筛选',
       'filter.clearAll': '清除全部',
-      'filter.typeSection': '类型',
-      'filter.sourceSection': '来源',
+      'filter.typeSection': '类型 (Type)',
+      'filter.sourceSection': '来源 (Source)',
       'filter.withinAll': '全部类型内',
       'filter.withinAllSources': '全部来源内',
       'filter.within': '在「{value}」内',
       'filter.typeLabel': '类型',
       'filter.typeAll': '全部类型',
       'filter.allFiles': '全部文件',
+      'filter.recommended': '全部推荐',
+      'filter.allSent': '全部发送',
+      'filter.allPinned': '全部收藏',
+      'filter.allArchived': '全部归档',
+      'filter.archivedHint': '切换只看已归档备份的文件',
       'context.isolation': '隔离范围',
       'context.project': '项目',
       'context.allProjects': '所有项目',
       'context.noProject': '无项目',
       'group.byCategory': '按类型',
       'group.byProject': '按项目',
+      'group.flat': '平铺',
       'filter.byType': '按类型筛选',
       'filter.bySource': '按来源筛选',
       'filter.clear': '清除筛选',
@@ -2694,32 +3783,34 @@ window.__ModuleLoader__.load({
       'filter.sourceAll': '全部来源',
       'filter.archived': '已归档',
       'filter.all': '全部',
-      'filter.document': '文档',
-      'filter.slides': '演示',
-      'filter.sheets': '表格',
+      'filter.document': 'Word',
+      'filter.slides': 'PPT',
+      'filter.sheets': 'Excel',
       'filter.pdf': 'PDF',
       'filter.markdown': 'Markdown',
-      'filter.text': '文本',
+      'filter.text': '文本/配置',
       'filter.image': '图片',
-      'filter.web': '网页',
+      'filter.web': '网页/样式',
       'filter.code': '代码',
       'filter.media': '音视频',
       'filter.archive': '压缩包',
-      'filter.design': '设计文件',
-      'filter.executable': '程序',
+      'filter.design': '设计稿',
+      'filter.executable': '可执行',
       'filter.database': '数据库',
       'filter.font': '字体',
       'filter.disk': '磁盘镜像',
       'filter.binary': '二进制',
       'filter.folder': '文件夹',
       'filter.other': '其他',
-      'source.delivered': '交付',
-      'source.written': '生成',
-      'source.edited': '修改',
-      'source.attachment': '用户',
+      'source.delivered': '对话交付',
+      'source.written': 'AI 生成',
+      'source.edited': 'AI 修改',
+      'source.attachment': '我发送的',
+      'source.reference': '对话引用',
       'source.archived': '已归档',
       'source.missing': '不存在',
       'source.moved': '已移动',
+      'badge.antiCompaction': '★防压缩',
       'source.missingHint': '原路径不存在，文件可能已删除或移动到其他磁盘。',
       'reference.badge': '引用',
       'reference.trace': '查看引用来源',
@@ -2732,9 +3823,9 @@ window.__ModuleLoader__.load({
       'trace.excerpt': '原始内容',
       'trace.close': '关闭',
       'toast.missing': '文件不存在，可能已删除或移动',
-      'source.read': '参考',
+      'source.read': '参考读取',
       'source.workspace': '工作区',
-      'source.pinned': '收藏',
+      'source.pinned': '防压缩收藏',
       'select.count': '已选 {count} 项',
       'select.all': '全选',
       'select.clear': '清空',
@@ -2754,6 +3845,7 @@ window.__ModuleLoader__.load({
       'menu.delete': '删除文件…',
       'menu.forget': '移除不存在记录',
       'menu.noApps': '未检测到关联软件',
+      'menu.hostOutdated': '需重启 DSH（或重开插件）以加载新版检测接口',
       'menu.pin': '收藏路径（防上下文压缩）',
       'menu.unpin': '取消收藏',
       'menu.archive': '归档副本（原文件保留）',
@@ -2772,6 +3864,16 @@ window.__ModuleLoader__.load({
       'history.count': '{count} 个历史对话',
       'history.emptyTitle': '没有找到对话',
       'loading': '正在读取文件…',
+      'loading.comfort.session': '正在为您整理本次对话的产出与关联文件，请稍候…',
+      'loading.comfort.sent': '正在为您归整发送与 @引用文件记录，请稍候…',
+      'loading.comfort.project': '正在扫描当前项目目录并对齐结构，请稍候…',
+      'loading.comfort.sessionMid': '本次对话记录较丰富，正在仔细梳理中，不用着急…',
+      'loading.comfort.sentMid': '正在跨对话核对发送和引用文件，马上就好…',
+      'loading.comfort.projectMid': '当前项目文件较多，正在加速扫描整理中，请再等几秒…',
+      'loading.comfort.long': '内容规模较大，正在全力收尾中，请再多给一点耐心，马上呈现…',
+      'loading.eta': '已用 {elapsed} 秒 · 预计共需 {low}–{high} 秒（约剩 {remain} 秒）',
+      'loading.etaFinishing': '已用 {elapsed} 秒 · 资料较多，正在收尾呈现…',
+      'loading.comfort.hint': '就绪后会立刻显示；您也可以随时切换上方分类。',
       'error.title': '读取失败',
       'error.retry': '重试',
       'viewer.title': '文件预览',
@@ -2867,27 +3969,64 @@ window.__ModuleLoader__.load({
       'scope.sentTitle': 'Sent by me · all projects and conversations',
       'scope.project': 'Project',
       'scope.pins': 'Pinned',
+      'scope.pinsTitle': '★ Pinned paths (anti-compaction)',
       'scope.history': 'History',
+      'scope.convKind': 'Chat',
+      'scope.historyKind': 'History',
+      'scope.historyProjKind': 'Project',
+      'scope.allKind': 'All',
+      'scope.sentAllKind': 'All',
+      'scope.allRegions': 'All projects & chats',
+      'scope.noWorkspaceShort': 'No workspace',
+      'scope.sentGroupTitle': 'Sent files · Region scope',
+      'scope.pinsGroupTitle': '★ Pinned files · Region scope',
+      'scope.sentTreeTitle': 'Filter by project & chat',
+      'scope.pinsTreeTitle': 'Filter by project & chat',
+      'scope.sentAllOption': 'All projects & chats (grouped)',
+      'scope.pinsAllOption': 'All pinned files',
+      'scope.projectGroupTitle': 'Workspace project folders',
+      'scope.projStat': '{count} projects',
+      'scope.regionStripLabel': 'Scope',
+      'scope.showProject': 'View current project ({count})',
+      'scope.showAll': 'View all projects ({count})',
+      'scope.current': 'Current',
+      'scope.currentSessionGroup': 'Current conversation & workspace',
+      'scope.isolationHint': 'Adapts dynamically to the active tab: switch conversation, project, or all regions',
+      'scope.sessionCount': '{count} chats',
+      'tab.session': 'Outputs',
+      'tab.sent': 'Sent',
+      'tab.pinned': '★ Pinned',
+      'tab.project': 'Project',
       'action.refresh': 'Refresh',
       'action.select': 'Select',
       'action.done': 'Done',
+      'action.backCurrent': 'Current chat',
+      'action.backCurrentHint': 'Return to the active conversation',
       'action.preview': 'Preview in sidebar',
       'action.previewInline': 'Preview here',
       'action.menu': 'Open with',
+      'action.actions': 'Actions',
       'action.folder': 'Open in Explorer',
-      'action.addToInput': 'Insert reference',
+      'action.addToInput': 'Insert ref',
+      'action.insertShort': 'Insert',
+      'action.insertHint': 'Insert @ reference directly into the composer',
+      'action.attachFiles': 'Attach',
+      'action.attachFilesHint': 'Drop selected files as composer attachments (falls back to @ refs for folders/large files)',
       'action.pin': 'Pin',
       'action.unpin': 'Unpin',
       'action.archive': 'Archive',
       'action.copyPath': 'Copy path',
-      'action.copyRef': 'Copy reference',
-      'search.placeholder': 'Search name, path, or description',
+      'action.copyRef': 'Copy ref',
+      'action.copyRefHint': 'Copy @ reference to clipboard',
+      'search.placeholder': 'Search name, path, ext, or type...',
       'history.search': 'Search conversations',
       'sort.label': 'Sort',
-      'sort.time': 'By time',
-      'sort.name': 'By name',
-      'sort.type': 'By type',
+      'sort.time': 'Newest↓',
+      'sort.timeAsc': 'Oldest↑',
+      'sort.name': 'Name',
+      'sort.type': 'Type',
       'group.unknown': 'Unknown project',
+      'group.standalone': 'Standalone chats',
       'group.workspace': 'Workspace files',
       'group.untitled': 'Untitled conversation',
       'filter.label': 'Type filter',
@@ -2902,12 +4041,18 @@ window.__ModuleLoader__.load({
       'filter.typeLabel': 'Type',
       'filter.typeAll': 'All types',
       'filter.allFiles': 'All files',
-      'context.isolation': 'Isolated to',
+      'filter.recommended': 'Recommended',
+      'filter.allSent': 'All sent',
+      'filter.allPinned': 'All pinned',
+      'filter.allArchived': 'All archived',
+      'filter.archivedHint': 'Toggle archived files only',
+      'context.isolation': 'Scope',
       'context.project': 'Project',
       'context.allProjects': 'All projects',
       'context.noProject': 'No project',
       'group.byCategory': 'By type',
       'group.byProject': 'By project',
+      'group.flat': 'Flat',
       'filter.byType': 'Filter by type',
       'filter.bySource': 'Filter by source',
       'filter.clear': 'Clear filters',
@@ -2917,32 +4062,34 @@ window.__ModuleLoader__.load({
       'filter.sourceAll': 'All sources',
       'filter.archived': 'Archived',
       'filter.all': 'All',
-      'filter.document': 'Documents',
-      'filter.slides': 'Slides',
-      'filter.sheets': 'Sheets',
+      'filter.document': 'Word',
+      'filter.slides': 'PPT',
+      'filter.sheets': 'Excel',
       'filter.pdf': 'PDF',
       'filter.markdown': 'Markdown',
-      'filter.text': 'Text',
+      'filter.text': 'Text / Config',
       'filter.image': 'Images',
-      'filter.web': 'Web',
+      'filter.web': 'Web / Styles',
       'filter.code': 'Code',
       'filter.media': 'Media',
       'filter.archive': 'Archives',
-      'filter.design': 'Design files',
-      'filter.executable': 'Applications',
+      'filter.design': 'Design',
+      'filter.executable': 'Executables',
       'filter.database': 'Databases',
       'filter.font': 'Fonts',
-      'filter.disk': 'Disk images',
+      'filter.disk': 'Disk Images',
       'filter.binary': 'Binaries',
       'filter.folder': 'Folders',
       'filter.other': 'Other',
       'source.delivered': 'Delivered',
       'source.written': 'Created',
       'source.edited': 'Edited',
-      'source.attachment': 'User',
+      'source.attachment': 'Sent',
+      'source.reference': 'Referenced',
       'source.archived': 'Archived',
       'source.missing': 'Missing',
       'source.moved': 'Moved',
+      'badge.antiCompaction': '★Pinned',
       'source.missingHint': 'The original path no longer exists; the file may have been deleted or moved to another drive.',
       'reference.badge': 'Reference',
       'reference.trace': 'Show reference origin',
@@ -2977,6 +4124,7 @@ window.__ModuleLoader__.load({
       'menu.delete': 'Delete file…',
       'menu.forget': 'Remove missing record',
       'menu.noApps': 'No associated application detected',
+      'menu.hostOutdated': 'Restart DSH (or reload plugin) to enable desktop app detection',
       'menu.pin': 'Pin path (survives context compaction)',
       'menu.unpin': 'Unpin',
       'menu.archive': 'Archive a copy (original kept)',
@@ -2995,6 +4143,16 @@ window.__ModuleLoader__.load({
       'history.count': '{count} conversations',
       'history.emptyTitle': 'No conversations found',
       'loading': 'Reading files…',
+      'loading.comfort.session': 'Organizing deliverables and files from this conversation…',
+      'loading.comfort.sent': 'Gathering files and @references you sent across conversations…',
+      'loading.comfort.project': 'Scanning the current project workspace and organizing files…',
+      'loading.comfort.sessionMid': 'This conversation has rich history—still sorting cleanly, just a moment…',
+      'loading.comfort.sentMid': 'Checking sent files and references across sessions—almost ready…',
+      'loading.comfort.projectMid': 'This project has many files—speeding through the directory scan, hang tight…',
+      'loading.comfort.long': 'Large workspace or history—finishing up the final pass, thanks for your patience…',
+      'loading.eta': 'Elapsed {elapsed}s · Est. {low}–{high}s (~{remain}s left)',
+      'loading.etaFinishing': 'Elapsed {elapsed}s · Finishing final pass…',
+      'loading.comfort.hint': 'Results appear automatically once ready; feel free to switch tabs anytime.',
       'error.title': 'Could not read files',
       'error.retry': 'Retry',
       'viewer.title': 'File preview',
@@ -3048,586 +4206,1492 @@ window.__ModuleLoader__.load({
     /* ─────────────────────────── styles ─────────────────────────── */
 
     const CSS = `
+.dfl-theme {
+  --dfl-bg-canvas: var(--dsw-alias-bg-base, #f7f7f8);
+  --dfl-bg-card: var(--dsw-alias-bg-layer-1, #ffffff);
+  --dfl-bg-subtle: var(--dsw-alias-bg-layer-2, #eff0f1);
+  --dfl-bg-fill: color-mix(in srgb, var(--dfl-ink) 6%, transparent);
+  --dfl-bg-field: color-mix(in srgb, var(--dfl-ink) 4.5%, transparent);
+  --dfl-border: var(--dsw-alias-border-l3, rgba(0, 0, 0, 0.13));
+  --dfl-border-soft: color-mix(in srgb, var(--dsw-alias-border-l3, rgba(0, 0, 0, 0.08)) 70%, transparent);
+  --dfl-ink: var(--dsw-alias-label-primary, #1d1f21);
+  --dfl-ink-2: var(--dsw-alias-label-secondary, #3d4348);
+  --dfl-ink-3: var(--dsw-alias-label-tertiary, #5d676f);
+  --dfl-ink-4: var(--dsw-alias-label-caption, #9da5ab);
+  --dfl-hover: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, 0.05));
+  --dfl-active: var(--dsw-alias-interactive-bg-active, rgba(0, 0, 0, 0.09));
+  --dfl-accent: var(--dsw-alias-state-business-primary, #007acc);
+  --dfl-danger: var(--dsw-alias-state-error-primary, #dc2626);
+  --dfl-warning: var(--dsw-alias-state-warning-primary, #d97706);
+  --dfl-ref-accent: #4f46e5;
+  --dfl-star: #f59e0b;
+  --dfl-popover-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --dfl-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --dfl-viewer-stage: color-mix(in srgb, var(--dfl-bg-subtle) 84%, var(--dfl-bg-canvas));
+  color: var(--dfl-ink);
+}
+.dfl-theme[data-dfl-scheme="light"],
+html[data-dfl-theme="light"] .dfl-theme {
+  color-scheme: light;
+  --dsw-alias-bg-base: #f7f7f8;
+  --dsw-alias-bg-layer-1: #ffffff;
+  --dsw-alias-bg-layer-2: #eff0f1;
+  --dsw-alias-border-l3: rgba(0, 0, 0, 0.12);
+  --dsw-alias-label-primary: #1d1f21;
+  --dsw-alias-label-secondary: #3d4348;
+  --dsw-alias-label-tertiary: #5d676f;
+  --dsw-alias-label-caption: #9da5ab;
+  --dsw-alias-interactive-bg-hover: rgba(0, 0, 0, 0.05);
+  --dsw-alias-interactive-bg-active: rgba(0, 0, 0, 0.09);
+  --dsw-alias-state-business-primary: #007acc;
+  --dsw-alias-state-error-primary: #dc2626;
+  --dsw-alias-state-warning-primary: #d97706;
+  --dsw-focus-ring-color: #007acc;
+  --dfl-ref-accent: #4f46e5;
+  --dfl-star: #f59e0b;
+  --dfl-popover-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --dfl-viewer-stage: #e9eaee;
+  color: var(--dfl-ink);
+}
+.dfl-theme[data-dfl-scheme="dark"],
+html[data-dfl-theme="dark"] .dfl-theme {
+  color-scheme: dark;
+  --dsw-alias-bg-base: #0d0d0f;
+  --dsw-alias-bg-layer-1: #141417;
+  --dsw-alias-bg-layer-2: #1c1c21;
+  --dsw-alias-border-l3: rgba(255, 255, 255, 0.14);
+  --dsw-alias-label-primary: #ececf1;
+  --dsw-alias-label-secondary: #b4b4be;
+  --dsw-alias-label-tertiary: #7d7d8a;
+  --dsw-alias-label-caption: #5a5a66;
+  --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.06);
+  --dsw-alias-interactive-bg-active: rgba(255, 255, 255, 0.11);
+  --dsw-alias-state-business-primary: #60a5fa;
+  --dsw-alias-state-error-primary: #f87171;
+  --dsw-alias-state-warning-primary: #fbbf24;
+  --dsw-focus-ring-color: #60a5fa;
+  --dfl-ref-accent: #a5b4fc;
+  --dfl-star: #fbbf24;
+  --dfl-popover-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --dfl-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --dfl-viewer-stage: #09090b;
+  color: var(--dfl-ink);
+}
 .dfl-root {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
   position: relative;
-  color: var(--dsw-alias-label-primary);
-  background: var(--dsw-alias-bg-base);
+  color: var(--dfl-ink);
+  background: var(--dfl-bg-canvas);
   font-size: 13px;
-  line-height: 20px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
 }
-.dfl-root *, .dfl-root *::before, .dfl-root *::after { box-sizing: border-box; }
-.dfl-head { padding: 12px 14px 8px; border-bottom: 0.5px solid var(--dsw-alias-border-l3); flex: none; }
-.dfl-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.dfl-title { display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--dsw-alias-label-primary); }
-.dfl-head-back {
-  width: 26px; height: 26px; flex: none; border: 0.5px solid var(--dsw-alias-border-l3);
-  border-radius: 7px; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 14px; line-height: 1; cursor: pointer;
+.dfl-root *, .dfl-root *::before, .dfl-root *::after,
+.dfl-viewer-modal *, .dfl-confirm-modal *, .dfl-context-layer *, .dfl-filter-popover *, .dfl-scope-dropdown * { box-sizing: border-box; }
+
+/* ── Row 1: Top Scope Dropdown Bar (Antigravity #scopeBar) ── */
+.dfl-scope-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 5px;
+  border-bottom: 1px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-card);
+  flex: none;
 }
-.dfl-head-back:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-title-text { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-head-actions { display: flex; align-items: center; gap: 2px; flex: none; }
-.dfl-tool {
-  height: 26px; min-width: 26px; padding: 0 6px; border: 0; border-radius: 7px;
-  background: transparent; color: var(--dsw-alias-label-secondary); font: inherit; font-size: 13px;
-  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+.dfl-scope-bar-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dfl-ink-3);
+  white-space: nowrap;
+  flex: none;
 }
-.dfl-tool:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-tool.is-on { background: var(--dsw-alias-interactive-bg-active); color: var(--dsw-alias-label-primary); }
-.dfl-select-toggle { font-size: 12px; padding: 0 9px; }
-.dfl-subtitle { margin-top: 3px; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.dfl-subtitle-title { font-size: 12px; color: var(--dsw-alias-label-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-subtitle-path { font-size: 11px; color: var(--dsw-alias-label-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
-.dfl-context-bar {
-  display: flex; align-items: center; gap: 6px; min-width: 0; margin: 1px 12px 0; padding: 6px 8px;
-  border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px; background: var(--dsw-alias-bg-layer-1);
-  font-size: 11px; color: var(--dsw-alias-label-tertiary); flex: none;
+.dfl-scope-select-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
 }
-.dfl-context-label { flex: none; }
-.dfl-context-scope { flex: none; color: var(--dsw-alias-label-secondary); font-weight: 500; }
-.dfl-context-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-primary); }
-.dfl-context-count {
-  flex: none; min-width: 18px; height: 17px; padding: 0 5px; border-radius: 9px;
-  display: inline-flex; align-items: center; justify-content: center;
-  background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-secondary); font-size: 10px;
+.dfl-scope-trigger {
+  width: 100%;
+  height: 26px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--dfl-border);
+  background: var(--dfl-bg-canvas);
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 120ms ease, border-color 120ms ease;
 }
-.dfl-context-project { margin-left: auto; flex: none; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dfl-category-tabs {
-  display: flex; gap: 4px; padding: 6px 12px 7px; overflow-x: auto; flex: none;
-  border-bottom: 0.5px solid var(--dsw-alias-border-l3); scrollbar-width: none;
+.dfl-scope-trigger:hover, .dfl-scope-trigger.is-open {
+  background: var(--dfl-hover);
+  border-color: var(--dfl-accent);
 }
-.dfl-category-tabs::-webkit-scrollbar { display: none; }
-.dfl-category-tab {
-  display: inline-flex; align-items: center; gap: 5px; flex: none; height: 26px; padding: 0 9px;
-  border: 0.5px solid transparent; border-radius: 7px; background: transparent;
-  color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px; cursor: pointer; white-space: nowrap;
+.dfl-scope-trigger-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
 }
-.dfl-category-tab:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-category-tab.is-active {
-  background: var(--dsw-alias-bg-layer-1); border-color: var(--dsw-alias-border-l3);
-  color: var(--dsw-alias-label-primary); font-weight: 500;
+.dfl-scope-kind-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--dfl-accent) 14%, transparent);
+  color: var(--dfl-accent);
+  flex: none;
+  line-height: 1.3;
 }
-.dfl-category-tab-count { color: var(--dsw-alias-label-tertiary); font-size: 10px; }
-.dfl-group-toggle {
-  height: 30px; flex: none; padding: 0 9px; border-radius: 8px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px;
-  cursor: pointer; white-space: nowrap;
+.dfl-scope-kind-badge.is-history {
+  background: color-mix(in srgb, #f59e0b 16%, transparent);
+  color: #d97706;
 }
-.dfl-group-toggle:hover { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-category-group { margin: 0 0 5px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 9px; overflow: hidden; background: var(--dsw-alias-bg-layer-1); }
-.dfl-category-group-head {
-  width: 100%; min-height: 34px; padding: 0 10px; border: 0; display: flex; align-items: center; gap: 6px;
-  background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; cursor: pointer; text-align: left;
+.dfl-scope-trigger-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  color: var(--dfl-ink);
 }
-.dfl-category-group-head:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-category-group-head .dfl-group-count { margin-left: auto; }
-.dfl-scopes { display: flex; gap: 4px; padding: 8px 12px 7px; overflow-x: auto; flex: none; scrollbar-width: none; }
-.dfl-scopes::-webkit-scrollbar { display: none; }
-.dfl-scope {
-  border: 0.5px solid transparent; border-radius: 999px; background: transparent; color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 12px; line-height: 22px; padding: 0 10px; white-space: nowrap; cursor: pointer;
+.dfl-scope-trigger-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--dfl-ink-3);
+  flex: none;
+  font-variant-numeric: tabular-nums;
 }
-.dfl-scope:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-scope[aria-pressed="true"] {
-  background: var(--dsw-alias-bg-layer-1); border-color: var(--dsw-alias-border-l3);
-  color: var(--dsw-alias-label-primary); font-weight: 500;
+.dfl-scope-proj-stat {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink-3);
+  white-space: nowrap;
+  flex: none;
+  font-variant-numeric: tabular-nums;
 }
-.dfl-toolbar { padding: 0 12px 8px; display: flex; flex-direction: column; gap: 7px; flex: none; }
-.dfl-search-row { display: flex; gap: 6px; align-items: center; }
+.dfl-scope-back-btn {
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--dfl-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--dfl-accent) 10%, transparent);
+  color: var(--dfl-accent);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  flex: none;
+}
+.dfl-scope-back-btn:hover {
+  background: color-mix(in srgb, var(--dfl-accent) 18%, transparent);
+}
+.dfl-scope-dropdown {
+  position: fixed;
+  z-index: 10002;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--dfl-bg-card);
+  border: 1px solid var(--dfl-border);
+  border-radius: 8px;
+  box-shadow: var(--dfl-popover-shadow);
+  padding: 5px;
+  color: var(--dfl-ink);
+  font-size: 11.5px;
+}
+.dfl-scope-group-title {
+  padding: 4px 8px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--dfl-ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.dfl-scope-sub-group {
+  padding: 4px 8px 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dfl-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dfl-scope-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 11.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.dfl-scope-opt:hover { background: var(--dfl-hover); }
+.dfl-scope-opt.is-active {
+  background: color-mix(in srgb, var(--dfl-accent) 13%, transparent);
+  color: var(--dfl-accent);
+  font-weight: 600;
+}
+.dfl-scope-opt-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.dfl-scope-opt-icon { display: inline-flex; color: var(--dfl-ink-3); flex: none; }
+.dfl-scope-opt-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dfl-scope-opt-cur {
+  font-size: 9px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: color-mix(in srgb, #10b981 18%, transparent);
+  color: #10b981;
+  flex: none;
+}
+.dfl-scope-opt-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  font-size: 10.5px;
+  color: var(--dfl-ink-3);
+}
+.dfl-proj-ws-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  flex: none;
+}
+.dfl-scope-divider {
+  height: 1px;
+  background: var(--dfl-border-soft);
+  margin: 4px 2px;
+}
+.dfl-scope-empty-hint {
+  padding: 4px 8px;
+  font-size: 10.5px;
+  color: var(--dfl-ink-3);
+}
+.dfl-scope-proj-opt {
+  font-weight: 600;
+  margin-top: 2px;
+}
+.dfl-scope-nested-opt {
+  padding-left: 22px;
+  font-size: 11px;
+  color: var(--dfl-ink-2);
+}
+.dfl-region-strip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-canvas);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: none;
+}
+.dfl-region-strip::-webkit-scrollbar { display: none; }
+.dfl-region-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--dfl-ink-3);
+  white-space: nowrap;
+  flex: none;
+}
+.dfl-region-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 21px;
+  padding: 0 8px;
+  border-radius: 5px;
+  border: 1px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-card);
+  color: var(--dfl-ink-2);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.dfl-region-pill:hover { background: var(--dfl-hover); color: var(--dfl-ink); }
+.dfl-region-pill.is-active {
+  background: color-mix(in srgb, var(--dfl-accent) 13%, transparent);
+  color: var(--dfl-accent);
+  border-color: color-mix(in srgb, var(--dfl-accent) 36%, transparent);
+  font-weight: 600;
+}
+.dfl-region-num {
+  font-size: 10px;
+  opacity: 0.78;
+  font-variant-numeric: tabular-nums;
+}
+.dfl-region-custom {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--dfl-accent);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* ── Row 2: Codex Header (4 Segmented Tabs + Right Tool Buttons) ── */
+.dfl-codex-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-canvas);
+  flex: none;
+}
+.dfl-seg-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--dfl-bg-fill);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--dfl-border-soft);
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+.dfl-seg-tabs::-webkit-scrollbar { display: none; }
+.dfl-seg-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--dfl-ink-2);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+.dfl-seg-tab:hover { color: var(--dfl-ink); }
+.dfl-seg-tab.is-active,
+.dfl-seg-tab[aria-pressed="true"] {
+  background: var(--dfl-bg-card);
+  color: var(--dfl-ink);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.dfl-seg-tab:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dfl-accent)); outline-offset: -2px; }
+.dfl-seg-count {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  color: var(--dfl-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.dfl-header-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+.dfl-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 5px;
+  border: 1px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-card);
+  color: var(--dfl-ink-2);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+.dfl-icon-btn:hover {
+  background: var(--dfl-hover);
+  color: var(--dfl-ink);
+  border-color: var(--dfl-border);
+}
+.dfl-icon-btn.is-active {
+  background: var(--dfl-active);
+  color: var(--dfl-ink);
+  border-color: var(--dfl-border);
+  font-weight: 500;
+}
+.dfl-select-toggle.is-active {
+  color: var(--dfl-accent);
+  border-color: color-mix(in srgb, var(--dfl-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--dfl-accent) 10%, var(--dfl-bg-card));
+}
+.dfl-refresh-btn.is-loading svg { animation: dfl-spin 0.8s linear infinite; }
+
+/* ── Row 3: Codex Flat Category Filter Strip (Antigravity .cat-bar) ── */
+.dfl-cat-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--dfl-border-soft);
+  overflow-x: auto;
+  flex: none;
+  scrollbar-width: none;
+}
+.dfl-cat-bar::-webkit-scrollbar { display: none; }
+.dfl-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--dfl-ink-3);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.dfl-cat-pill:hover {
+  color: var(--dfl-ink);
+  background: var(--dfl-hover);
+}
+.dfl-cat-pill.is-active {
+  color: var(--dfl-ink);
+  background: var(--dfl-bg-fill);
+  border-color: var(--dfl-border);
+  font-weight: 600;
+}
+.dfl-cat-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  opacity: 0.78;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Row 4: Search + Filter ▾ + Archived Switch + Active Chips ── */
+.dfl-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 5px;
+  flex: none;
+  border-bottom: 1px solid var(--dfl-border-soft);
+}
+.dfl-search-box {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--dfl-bg-field);
+  border: 1px solid var(--dfl-border-soft);
+  border-radius: 6px;
+  padding: 0 8px;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.dfl-search-box:focus-within {
+  border-color: var(--dfl-accent);
+  background: var(--dfl-bg-card);
+}
+.dfl-search-icon { color: var(--dfl-ink-3); flex: none; }
 .dfl-search {
-  flex: 1; min-width: 0; height: 30px; border-radius: 8px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px;
-  padding: 0 9px; outline: none;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+  padding: 0;
 }
-.dfl-search::placeholder { color: var(--dsw-alias-label-tertiary); }
-.dfl-search:focus-visible { border-color: var(--dsw-alias-state-business-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-state-business-primary) 22%, transparent); }
-.dfl-sort {
-  height: 30px; max-width: 104px; border-radius: 8px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 12px; padding: 0 4px;
+.dfl-search::-webkit-search-cancel-button { display: none; }
+.dfl-search::placeholder { color: var(--dfl-ink-4); }
+.dfl-search-clear {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
 }
-.dfl-filterbar { position: relative; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 28px; }
-.dfl-filter-button { padding: 0 10px; font-weight: 500; }
-.dfl-filter-button-text { color: inherit; }
-.dfl-filter-active-count {
-  min-width: 17px; height: 17px; padding: 0 5px; border-radius: 9px; display: inline-flex;
-  align-items: center; justify-content: center; background: var(--dsw-alias-state-business-primary);
-  color: #fff; font-size: 10px; line-height: 1;
+.dfl-search-clear:hover { background: var(--dfl-active); color: var(--dfl-ink); }
+.dfl-toolbar-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--dfl-border);
+  background: var(--dfl-bg-card);
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
-.dfl-filter-tag {
-  display: inline-flex; align-items: center; gap: 3px; height: 26px; padding: 0 4px 0 8px;
-  border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px;
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary);
-  font-size: 11px; white-space: nowrap;
+.dfl-toolbar-pill-btn:hover { background: var(--dfl-hover); }
+.dfl-toolbar-pill-btn.is-active,
+.dfl-toolbar-pill-btn.is-open {
+  border-color: var(--dfl-accent);
+  color: var(--dfl-accent);
+  background: color-mix(in srgb, var(--dfl-accent) 10%, transparent);
 }
-.dfl-filter-tag-label { max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
-.dfl-filter-tag-clear {
-  width: 18px; height: 18px; border: 0; border-radius: 4px; background: transparent;
-  color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 1; cursor: pointer; padding: 0;
+.dfl-toolbar-pill-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink-2);
+  font-variant-numeric: tabular-nums;
 }
-.dfl-filter-tag-clear:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-filter-panel {
-  width: min(460px, calc(100vw - 40px)); max-height: 380px; padding: 6px;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 8px;
+.dfl-active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 5px 10px 6px;
+  border-bottom: 1px solid var(--dfl-border-soft);
+  flex: none;
 }
-.dfl-filter-panel-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 5px 8px 6px; }
-.dfl-filter-panel-title { font-size: 12px; font-weight: 600; color: var(--dsw-alias-label-primary); }
-.dfl-filter-column { min-width: 0; }
-.dfl-filter-column.is-child { border-left: 0.5px solid var(--dsw-alias-border-l3); padding-left: 9px; }
-.dfl-filter-section-title { padding: 5px 8px 3px; font-size: 10px; color: var(--dsw-alias-label-tertiary); }
-.dfl-filter-child-title { display: flex; align-items: baseline; gap: 4px; min-width: 0; }
-.dfl-filter-parent { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-caption); }
-.dfl-filter-divider { height: 0.5px; margin: 5px 4px; background: var(--dsw-alias-border-l3); }
-.dfl-filter-trigger {
-  display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 9px;
-  border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px;
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap;
+.dfl-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--dfl-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--dfl-accent) 28%, transparent);
+  color: var(--dfl-ink);
+  font-size: 10.5px;
 }
-.dfl-filter-trigger:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-filter-trigger.is-on { border-color: var(--dsw-alias-state-business-primary); color: var(--dsw-alias-state-business-primary); background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 7%, transparent); }
-.dfl-filter-trigger.is-open { border-color: var(--dsw-alias-state-business-primary); }
-.dfl-filter-key { font-size: 10.5px; color: var(--dsw-alias-label-tertiary); }
-.dfl-filter-trigger.is-on .dfl-filter-key { color: currentColor; opacity: 0.75; }
-.dfl-filter-value { font-weight: 500; }
-.dfl-filter-count {
-  min-width: 17px; padding: 0 5px; border-radius: 9px; text-align: center;
-  background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-tertiary);
-  font-size: 10px; line-height: 16px;
+.dfl-filter-chip button {
+  border: none;
+  background: transparent;
+  color: var(--dfl-ink-3);
+  cursor: pointer;
+  padding: 0 1px;
+  font-size: 12px;
+  line-height: 1;
 }
-.dfl-filter-clear { border: 0; background: transparent; color: var(--dsw-alias-state-business-primary); font: inherit; font-size: 11px; cursor: pointer; padding: 4px 2px; }
-.dfl-filter-total { margin-left: auto; color: var(--dsw-alias-label-tertiary); font-size: 10.5px; white-space: nowrap; }
+.dfl-filter-chip button:hover { color: var(--dfl-ink); }
+.dfl-filter-clear-btn {
+  border: none;
+  background: transparent;
+  color: var(--dfl-accent);
+  font: inherit;
+  font-size: 10.5px;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.dfl-filter-clear-btn:hover { text-decoration: underline; }
+
+/* ── Master-Detail Source × Type Filter Popover ── */
 .dfl-filter-popover {
-  position: absolute; top: calc(100% + 5px); left: 0; z-index: 36;
-  width: 252px; max-height: 300px; overflow-y: auto; overscroll-behavior: contain;
-  padding: 5px; border-radius: 10px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.24);
+  position: fixed;
+  z-index: 10002;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--dfl-border);
+  background: var(--dfl-bg-card);
+  box-shadow: var(--dfl-popover-shadow);
+  color: var(--dfl-ink);
+  font-size: 12px;
 }
-.dfl-filter-popover-title { padding: 5px 8px 6px; font-size: 10px; color: var(--dsw-alias-label-tertiary); }
+.dfl-filter-panel { display: flex; flex-direction: column; gap: 6px; }
+.dfl-filter-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid var(--dfl-border-soft);
+}
+.dfl-filter-panel-title { font-size: 11.5px; font-weight: 600; color: var(--dfl-ink); }
+.dfl-filter-clear { border: 0; background: transparent; color: var(--dfl-accent); font: inherit; font-size: 11px; font-weight: 500; cursor: pointer; padding: 2px 4px; }
+.dfl-filter-clear:hover { text-decoration: underline; }
+.dfl-filter-columns { display: grid; grid-template-columns: 1fr 1.15fr; column-gap: 8px; min-height: 0; overflow-y: auto; }
+.dfl-filter-column { min-width: 0; display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+.dfl-filter-column.is-child { border-left: 1px solid var(--dfl-border-soft); padding-left: 8px; }
+.dfl-filter-section-title { padding: 2px 6px 4px; font-size: 10px; font-weight: 600; color: var(--dfl-ink-3); }
+.dfl-filter-child-title { display: flex; align-items: baseline; gap: 4px; min-width: 0; }
+.dfl-filter-parent { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dfl-ink-4); font-weight: 400; }
 .dfl-filter-option {
-  display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 8px;
-  border: 0; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-primary);
-  font: inherit; font-size: 12px; text-align: left; cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 11.5px;
+  text-align: left;
+  cursor: pointer;
 }
-.dfl-filter-option:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-filter-option.is-on { color: var(--dsw-alias-state-business-primary); background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 7%, transparent); }
-.dfl-filter-option-label { flex: 1; }
-.dfl-filter-option-count { color: var(--dsw-alias-label-tertiary); font-size: 10.5px; }
-.dfl-filter-option.is-on .dfl-filter-option-count { color: currentColor; opacity: 0.75; }
-.dfl-filter-check { color: currentColor; font-size: 12px; }
-.dfl-chips { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; padding-bottom: 1px; }
-.dfl-grouped-list { padding-bottom: 6px; }
-.dfl-file-group { border-top: 0.5px solid var(--dsw-alias-border-l3); }
-.dfl-file-group:first-child { border-top: 0; }
-.dfl-group-project-head {
-  display: flex; align-items: center; gap: 6px; width: 100%; padding: 9px 13px 7px;
-  border: 0; background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary);
-  font: inherit; font-size: 11px; text-align: left; cursor: pointer;
+.dfl-filter-option:hover { background: var(--dfl-hover); }
+.dfl-filter-option.is-on {
+  background: color-mix(in srgb, var(--dfl-accent) 14%, transparent);
+  color: var(--dfl-accent);
+  font-weight: 600;
 }
-.dfl-group-project-head:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-group-chevron { flex: none; width: 12px; color: var(--dsw-alias-label-tertiary); font-size: 10px; }
-.dfl-group-name { flex: none; font-weight: 600; }
-.dfl-group-count { flex: none; color: var(--dsw-alias-label-tertiary); font-size: 10px; }
-.dfl-group-path {
-  min-width: 0; margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  color: var(--dsw-alias-label-caption); font-size: 10px; direction: rtl; text-align: left;
-}
-.dfl-group-session-head {
-  display: flex; align-items: center; gap: 5px; width: 100%; padding: 6px 13px 4px 25px;
-  border: 0; background: transparent; color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 11px; text-align: left; cursor: pointer;
-}
-.dfl-group-session-head:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-group-session-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dfl-file-session .dfl-item { padding-left: 10px; }
-.dfl-chips::-webkit-scrollbar { display: none; }
-.dfl-chip {
-  border: 0.5px solid transparent; border-radius: 999px; background: transparent; color: var(--dsw-alias-label-tertiary);
-  font: inherit; font-size: 11px; line-height: 22px; padding: 0 8px; white-space: nowrap; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 4px;
-}
-.dfl-chip:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-secondary); }
-.dfl-chip.is-on { background: var(--dsw-alias-bg-layer-1); border-color: var(--dsw-alias-border-l3); color: var(--dsw-alias-label-primary); }
-.dfl-chip-count { font-size: 10px; color: var(--dsw-alias-label-caption); }
-.dfl-selectbar {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 7px 12px;
-  border-top: 0.5px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-layer-1); flex: none;
-}
-.dfl-select-count { font-size: 11px; color: var(--dsw-alias-label-secondary); }
-.dfl-spacer { flex: 1; }
-.dfl-link { border: 0; background: transparent; color: var(--dsw-alias-state-business-primary); font: inherit; font-size: 11px; padding: 2px 3px; cursor: pointer; border-radius: 4px; }
-.dfl-link:hover { text-decoration: underline; }
+.dfl-filter-option-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dfl-filter-option-count { color: var(--dfl-ink-3); font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.dfl-filter-option.is-on .dfl-filter-option-count { color: currentColor; opacity: 0.85; }
+.dfl-filter-check { display: inline-flex; color: currentColor; }
+
+/* ── Main List & Codex 38px File Row ── */
 .dfl-body { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
-.dfl-list { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 6px 10px; scrollbar-width: thin; }
-.dfl-item { border-radius: 8px; }
+.dfl-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: thin;
+}
+.dfl-grouped-list { gap: 6px; padding-bottom: 16px; }
+.dfl-item { min-width: 0; }
 .dfl-row {
-  display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; cursor: pointer;
-  border: 0.5px solid transparent; min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 38px;
+  padding: 5px 8px 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-card);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
 }
-.dfl-row:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-row:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: -2px; }
-.dfl-row.is-selected { background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 9%, transparent); border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 22%, transparent); }
-.dfl-row.is-open { background: var(--dsw-alias-interactive-bg-active); }
-.dfl-check { width: 14px; height: 14px; flex: none; accent-color: var(--dsw-alias-state-business-primary); margin: 0; }
-.dfl-icon {
-  width: 30px; height: 30px; border-radius: 8px; flex: none; display: grid; place-items: center;
-  color: #fff; font-size: 8px; font-weight: 700; letter-spacing: 0.02em; line-height: 1;
-  background: #4a5568; overflow: hidden;
+.dfl-row:hover {
+  background: var(--dfl-hover);
+  border-color: var(--dfl-border);
 }
-.dfl-icon[data-cat="document"] { background: #2b6cb0; }
-.dfl-icon[data-cat="slides"] { background: #c05621; }
-.dfl-icon[data-cat="sheets"] { background: #2f855a; }
-.dfl-icon[data-cat="pdf"] { background: #c53030; }
-.dfl-icon[data-cat="markdown"] { background: #4c51bf; }
-.dfl-icon[data-cat="text"] { background: #4a5568; }
-.dfl-icon[data-cat="image"] { background: #b83280; }
-.dfl-icon[data-cat="web"] { background: #2c7a7b; }
-.dfl-icon[data-cat="code"] { background: #6b46c1; }
-.dfl-icon[data-cat="media"] { background: #975a16; }
-.dfl-icon[data-cat="archive"] { background: #718096; }
-.dfl-icon[data-cat="design"] { background: #9b2c2c; }
-.dfl-icon[data-cat="executable"] { background: #285e61; }
-.dfl-icon[data-cat="database"] { background: #2c5282; }
-.dfl-icon[data-cat="font"] { background: #744210; }
-.dfl-icon[data-cat="disk"] { background: #5a67d8; }
-.dfl-icon[data-cat="binary"] { background: #4a5568; }
-.dfl-icon[data-cat="folder"] { background: #b7791f; }
-.dfl-icon[data-cat="other"] { background: #4a5568; }
-.dfl-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.dfl-name-line { display: flex; align-items: center; gap: 5px; min-width: 0; }
-.dfl-name { font-size: 13px; font-weight: 500; color: var(--dsw-alias-label-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-badge {
-  flex: none; font-size: 9px; line-height: 15px; padding: 0 4px; border-radius: 4px;
-  background: var(--dsw-alias-bg-layer-1); border: 0.5px solid var(--dsw-alias-border-l3); color: var(--dsw-alias-label-tertiary);
+.dfl-row:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dfl-accent)); outline-offset: -2px; }
+.dfl-row.is-open { background: var(--dfl-active); border-color: var(--dfl-border); }
+.dfl-row.is-selected {
+  background: color-mix(in srgb, var(--dfl-accent) 9%, var(--dfl-bg-card));
+  border-color: color-mix(in srgb, var(--dfl-accent) 45%, transparent);
 }
-.dfl-badge.is-delivered { color: #2f855a; border-color: color-mix(in srgb, #2f855a 35%, transparent); }
-.dfl-badge.is-pinned { color: #b7791f; border-color: color-mix(in srgb, #b7791f 40%, transparent); }
-.dfl-badge.is-user { color: #2b6cb0; border-color: color-mix(in srgb, #2b6cb0 35%, transparent); }
-.dfl-badge.is-reference { color: #0f766e; border-color: color-mix(in srgb, #0f766e 35%, transparent); cursor: pointer; }
-.dfl-badge.is-archived { color: #6b46c1; border-color: color-mix(in srgb, #6b46c1 35%, transparent); }
-.dfl-badge.is-folder { color: var(--dsw-alias-label-secondary); border-color: var(--dsw-alias-border-l3); }
-.dfl-badge.is-missing { color: var(--dsw-alias-state-error-primary); border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 35%, transparent); }
-.dfl-badge.is-moved { color: var(--dsw-alias-state-warning-primary); border-color: color-mix(in srgb, var(--dsw-alias-state-warning-primary) 35%, transparent); }
+.dfl-row.is-reference {
+  border-left: 2px solid color-mix(in srgb, var(--dfl-ref-accent) 55%, transparent);
+}
 .dfl-row.is-missing { opacity: 0.72; }
-.dfl-trace-card { width: min(560px, calc(100vw - 32px)); }
-.dfl-trace-path { margin-top: 6px; color: var(--dsw-alias-label-tertiary); font-size: 11px; word-break: break-all; }
-.dfl-trace-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-.dfl-trace-row { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 11px; }
-.dfl-trace-row > span { color: var(--dsw-alias-label-tertiary); }
-.dfl-trace-row > code { color: var(--dsw-alias-label-secondary); word-break: break-all; white-space: pre-wrap; max-height: 96px; overflow: auto; }
-.dfl-meta { display: flex; align-items: baseline; gap: 0; min-width: 0; color: var(--dsw-alias-label-tertiary); font-size: 10.5px; }
+.dfl-row.is-missing .dfl-name { text-decoration: line-through; text-decoration-color: rgba(239, 68, 68, 0.45); }
+
+/* ── Star / Checkbox Gutter ── */
+.dfl-star-btn, .dfl-star-spacer {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.dfl-star-btn {
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--dfl-ink-4);
+  cursor: pointer;
+  transition: color 0.12s ease, transform 0.12s ease;
+}
+.dfl-star-btn:hover { color: var(--dfl-star); transform: scale(1.1); }
+.dfl-star-btn.is-pinned { color: var(--dfl-star); opacity: 1; }
+.dfl-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0 2px;
+  flex: none;
+  border-radius: 4px;
+  border: 1.5px solid var(--dfl-border);
+  background: var(--dfl-bg-card);
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+}
+.dfl-check:checked { background: var(--dfl-accent); border-color: var(--dfl-accent); }
+.dfl-check:checked::after {
+  content: '';
+  width: 3.5px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 1.8px 1.8px 0;
+  transform: rotate(42deg) translate(-0.5px, -0.5px);
+}
+
+/* ── Category Extension Capsules (19 Categories) ── */
+.dfl-icon {
+  min-width: 38px;
+  max-width: 44px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--dfl-border-soft);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink-2);
+  overflow: hidden;
+}
+.dfl-icon[data-cat="document"]   { color: #1d4ed8; background: rgba(37, 99, 235, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="slides"]     { color: #b45309; background: rgba(217, 119, 6, 0.12); border-color: transparent; }
+.dfl-icon[data-cat="sheets"]     { color: #047857; background: rgba(5, 150, 105, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="pdf"]        { color: #b91c1c; background: rgba(220, 38, 38, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="markdown"]   { color: #4338ca; background: rgba(79, 70, 229, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="text"]       { color: #475569; background: rgba(100, 116, 139, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="image"]      { color: #0e7490; background: rgba(8, 145, 178, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="web"]        { color: #0f766e; background: rgba(13, 148, 136, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="code"]       { color: #6d28d9; background: rgba(124, 58, 237, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="media"]      { color: #a16207; background: rgba(202, 138, 4, 0.11); border-color: transparent; }
+.dfl-icon[data-cat="archive"]    { color: #3f3f46; background: rgba(82, 82, 91, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="design"]     { color: #be123c; background: rgba(225, 29, 72, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="executable"] { color: #115e59; background: rgba(15, 118, 110, 0.11); border-color: transparent; }
+.dfl-icon[data-cat="database"]   { color: #0369a1; background: rgba(2, 132, 199, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="font"]       { color: #7e22ce; background: rgba(147, 51, 234, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="disk"]       { color: #3730a3; background: rgba(79, 70, 229, 0.10); border-color: transparent; }
+.dfl-icon[data-cat="binary"]     { color: #334155; background: rgba(71, 85, 105, 0.11); border-color: transparent; }
+.dfl-icon[data-cat="folder"]     { color: #b45309; background: rgba(217, 119, 6, 0.12); border-color: transparent; }
+.dfl-icon[data-cat="other"]      { color: #475569; background: rgba(100, 116, 139, 0.10); border-color: transparent; }
+
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="document"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="document"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="document"]   { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="slides"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="slides"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="slides"]     { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="sheets"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="sheets"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="sheets"]     { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="pdf"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="pdf"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="pdf"]        { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="markdown"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="markdown"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="markdown"]   { background: rgba(129, 140, 248, 0.15); color: #a5b4fc; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="text"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="text"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="text"]       { background: rgba(148, 163, 184, 0.14); color: #cbd5e1; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="image"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="image"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="image"]      { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="web"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="web"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="web"]        { background: rgba(45, 212, 191, 0.14); color: #5eead4; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="code"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="code"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="code"]       { background: rgba(167, 139, 250, 0.15); color: #ddd6fe; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="media"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="media"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="media"]      { background: rgba(250, 204, 21, 0.13); color: #fde047; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="archive"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="archive"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="archive"]    { background: rgba(161, 161, 170, 0.14); color: #d4d4d8; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="design"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="design"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="design"]     { background: rgba(251, 113, 133, 0.14); color: #fda4af; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="executable"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="executable"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="executable"] { background: rgba(20, 184, 166, 0.14); color: #5eead4; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="database"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="database"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="database"]   { background: rgba(56, 189, 248, 0.14); color: #7dd3fc; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="font"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="font"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="font"]       { background: rgba(192, 132, 252, 0.14); color: #e9d5ff; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="disk"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="disk"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="disk"]       { background: rgba(129, 140, 248, 0.14); color: #a5b4fc; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="binary"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="binary"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="binary"]     { background: rgba(148, 163, 184, 0.14); color: #cbd5e1; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="folder"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="folder"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="folder"]     { background: rgba(251, 191, 36, 0.14); color: #fcd34d; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-icon[data-cat="other"],
+html[data-dfl-theme="dark"] .dfl-theme .dfl-icon[data-cat="other"],
+body[data-ds-dark-theme] .dfl-icon[data-cat="other"]      { background: rgba(148, 163, 184, 0.14); color: #cbd5e1; }
+
+/* ── Row Content & Semantic Badges (1:1 Antigravity) ── */
+.dfl-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.dfl-name-line { display: flex; align-items: center; flex-wrap: nowrap; gap: 4px; min-width: 0; }
+.dfl-name {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--dfl-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dfl-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink-3);
+  font-family: inherit;
+}
+.dfl-badge.is-delivered { color: #059669; background: rgba(16, 185, 129, 0.13); }
+.dfl-badge.is-written   { color: #2563eb; background: rgba(59, 130, 246, 0.12); }
+.dfl-badge.is-edited    { color: #d97706; background: rgba(245, 158, 11, 0.14); }
+.dfl-badge.is-attachment { color: #7c3aed; background: rgba(139, 92, 246, 0.13); }
+.dfl-badge.is-read      { color: #64748b; background: rgba(100, 116, 139, 0.13); }
+.dfl-badge.is-workspace { color: #475569; background: rgba(100, 116, 139, 0.11); }
+.dfl-badge.is-proj      { color: var(--dfl-ink-3); background: var(--dfl-bg-fill); font-weight: 500; }
+.dfl-badge.is-pinned    { color: #d97706; background: rgba(245, 158, 11, 0.14); }
+.dfl-badge.is-archived  { color: #7c3aed; background: rgba(124, 58, 237, 0.12); }
+.dfl-badge.is-missing   { color: var(--dfl-danger); background: rgba(239, 68, 68, 0.13); }
+.dfl-badge.is-moved     { color: #0284c7; background: rgba(14, 165, 233, 0.13); }
+.dfl-badge.is-reference {
+  color: var(--dfl-ref-accent);
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  cursor: pointer;
+}
+.dfl-badge.is-reference:hover { background: rgba(99, 102, 241, 0.2); }
+.dfl-meta { display: flex; align-items: baseline; min-width: 0; color: var(--dfl-ink-3); font-size: 11px; }
 .dfl-meta-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.dfl-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dsw-alias-label-caption); }
-.dfl-row-actions { display: flex; align-items: center; gap: 3px; flex: none; opacity: 1; }
+.dfl-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dfl-ink-4); }
+
+/* ── Row Actions (Antigravity 26px Compact Buttons + DSH Insert) ── */
+.dfl-row-actions { display: inline-flex; align-items: center; gap: 5px; flex: none; }
+.dfl-row-act-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 7px;
+  background: var(--dfl-bg-card);
+  color: var(--dfl-ink-2);
+  border: 1px solid var(--dfl-border-soft);
+  border-radius: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.dfl-row-act-btn:hover {
+  background: var(--dfl-active);
+  color: var(--dfl-accent);
+  border-color: color-mix(in srgb, var(--dfl-accent) 45%, var(--dfl-border));
+}
 .dfl-open-button {
-  height: 24px; padding: 0 7px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 6px;
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 11px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 8px;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink);
+  border: 1px solid var(--dfl-border);
+  border-radius: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.12s ease;
 }
-.dfl-open-button:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-open-button:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: 1px; }
-.dfl-chevron { font-size: 9px; opacity: 0.7; }
-.dfl-icon-button {
-  width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 14px; line-height: 1; cursor: pointer; display: grid; place-items: center; padding: 0;
+.dfl-open-button:hover { background: var(--dfl-active); }
+.dfl-open-button:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dfl-accent)); outline-offset: 1px; }
+
+/* ── Collapsible Category & Project -> Session Groups ── */
+.dfl-group-caret { color: var(--dfl-ink-3); transition: transform 0.14s ease; }
+.dfl-group-caret.is-open { transform: rotate(90deg); }
+.dfl-category-group { display: flex; flex-direction: column; margin-bottom: 4px; }
+.dfl-category-group-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 5px 4px 4px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dfl-ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
 }
-.dfl-icon-button:hover { background: var(--dsw-alias-interactive-bg-active); color: var(--dsw-alias-label-primary); }
-.dfl-menu { margin: 2px 8px 8px 46px; padding: 7px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 9px; background: var(--dsw-alias-bg-layer-1); display: flex; flex-direction: column; gap: 5px; }
-.dfl-menu-select {
-  width: 100%; height: 30px; border-radius: 7px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; padding: 0 5px;
+.dfl-category-group-head:hover { color: var(--dfl-ink); }
+.dfl-category-group:not(.is-open) .dfl-svg-caret { transform: rotate(-90deg); }
+.dfl-group-rows { display: flex; flex-direction: column; gap: 4px; }
+
+.dfl-file-group {
+  margin-bottom: 6px;
+  border: 1px solid var(--dfl-border-soft);
+  border-radius: 7px;
+  background: var(--dfl-bg-card);
+  overflow: hidden;
 }
-.dfl-menu-note { margin: 0; font-size: 10.5px; color: var(--dsw-alias-label-tertiary); line-height: 15px; }
-.dfl-session {
-  display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; padding: 9px 9px;
-  border: 0.5px solid transparent; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer;
+.dfl-group-project-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 9px;
+  border: none;
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
 }
-.dfl-session:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-session:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: -2px; }
-.dfl-session-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-session-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10.5px; color: var(--dsw-alias-label-tertiary); }
-.dfl-session-project { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-session-time { flex: none; }
-.dfl-project { margin-bottom: 4px; }
-.dfl-project-head {
-  display: flex; align-items: center; gap: 6px; width: 100%; padding: 7px 8px; border: 0;
-  border-radius: 7px; background: transparent; color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 11.5px; text-align: left; cursor: pointer;
+.dfl-group-project-head:hover { background: var(--dfl-active); }
+.dfl-group-name { flex: none; max-width: 55%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-group-path {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--dfl-ink-4);
+  font-size: 10px;
+  font-weight: 400;
+  direction: rtl;
+  text-align: left;
 }
-.dfl-project-head:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-project-head:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: -2px; }
-.dfl-project-chevron { width: 11px; flex: none; color: var(--dsw-alias-label-tertiary); font-size: 10px; }
-.dfl-project-name { font-weight: 600; flex: none; max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-project-count {
-  flex: none; min-width: 17px; padding: 0 4px; border-radius: 999px; text-align: center;
-  background: var(--dsw-alias-bg-layer-1); border: 0.5px solid var(--dsw-alias-border-l3);
-  font-size: 9.5px; line-height: 14px; color: var(--dsw-alias-label-tertiary);
+.dfl-group-count {
+  margin-left: auto;
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  color: var(--dfl-ink-3);
+  font-variant-numeric: tabular-nums;
 }
-.dfl-project-path { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dsw-alias-label-tertiary); font-size: 10px; }
-.dfl-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 28px 22px; text-align: center; }
-.dfl-empty-title { margin: 0; font-size: 13px; font-weight: 600; color: var(--dsw-alias-label-secondary); }
-.dfl-empty-text { margin: 0; font-size: 11.5px; color: var(--dsw-alias-label-tertiary); line-height: 17px; max-width: 300px; }
-.dfl-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--dsw-alias-border-l3); border-top-color: var(--dsw-alias-state-business-primary); animation: dfl-spin 0.8s linear infinite; }
-@keyframes dfl-spin { to { transform: rotate(360deg); } }
+.dfl-group-sessions { display: flex; flex-direction: column; }
+.dfl-file-session { border-top: 1px solid var(--dfl-border-soft); }
+.dfl-file-session .dfl-group-rows { padding: 4px 6px 6px; }
+.dfl-group-session-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 5px 10px 5px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--dfl-ink-2);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+.dfl-group-session-head:hover { background: var(--dfl-hover); color: var(--dfl-ink); }
+.dfl-group-session-name { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dfl-group-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: color-mix(in srgb, #10b981 18%, transparent);
+  color: #10b981;
+  flex: none;
+  line-height: 1.4;
+}
+
+/* ── Bottom Docked Composite Action Bar (Antigravity #compositeBar) ── */
+.dfl-composite-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--dfl-border);
+  background: var(--dfl-bg-card);
+  flex: none;
+}
+.dfl-comp-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--dfl-ink-2);
+}
+.dfl-comp-count {
+  font-size: 11.5px;
+  color: var(--dfl-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.dfl-comp-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.dfl-comp-btn {
+  height: 25px;
+  padding: 0 8px;
+  border-radius: 5px;
+  border: 1px solid var(--dfl-border);
+  background: var(--dfl-bg-fill);
+  color: var(--dfl-ink);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: background-color 0.12s ease;
+}
+.dfl-comp-btn:hover:not(:disabled) { background: var(--dfl-active); }
+.dfl-comp-btn:disabled { opacity: 0.45; cursor: default; }
+.dfl-comp-btn.is-primary {
+  background: var(--dfl-ink);
+  color: var(--dfl-bg-card);
+  border-color: var(--dfl-ink);
+}
+.dfl-comp-btn.is-primary:hover:not(:disabled) { opacity: 0.9; }
+
+.dfl-link {
+  display: inline-flex; align-items: center; gap: 3px;
+  border: 0; background: transparent; color: var(--dfl-accent);
+  font: inherit; font-size: 11px; font-weight: 500; padding: 2px 4px; cursor: pointer; border-radius: 4px;
+}
+.dfl-link:hover { background: color-mix(in srgb, var(--dfl-accent) 9%, transparent); }
 .dfl-button {
-  height: 27px; padding: 0 10px; border-radius: 7px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); font: inherit; font-size: 11.5px; cursor: pointer;
+  height: 26px; padding: 0 10px; border-radius: 5px; border: 1px solid var(--dfl-border);
+  background: var(--dfl-bg-card); color: var(--dfl-ink); font: inherit; font-size: 11.5px; font-weight: 500;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+  transition: background-color 120ms ease;
 }
-.dfl-button:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-button:disabled { opacity: 0.45; cursor: default; }
+.dfl-button:hover:not(:disabled) { background: var(--dfl-hover); }
+.dfl-button:disabled { opacity: 0.42; cursor: default; }
+.dfl-button.is-primary { background: var(--dfl-accent); color: #fff; border-color: var(--dfl-accent); }
+.dfl-button.is-primary:hover:not(:disabled) { filter: brightness(1.06); }
+.dfl-button.is-danger { background: var(--dfl-danger); color: #fff; border-color: var(--dfl-danger); }
+.dfl-button.is-danger:hover:not(:disabled) { filter: brightness(1.06); }
+
+/* ── empty / loading / footer / toast ── */
+.dfl-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 30px 20px; text-align: center; }
+.dfl-empty-title { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--dfl-ink-2); }
+.dfl-empty-text { margin: 0; font-size: 11.5px; color: var(--dfl-ink-3); line-height: 1.5; max-width: 280px; }
+.dfl-empty-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.dfl-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--dfl-border); border-top-color: var(--dfl-accent); animation: dfl-spin 0.8s linear infinite; flex: none; }
+.dfl-loading-card { gap: 8px; }
+.dfl-loading-head { display: inline-flex; align-items: center; justify-content: center; gap: 8px; max-width: 300px; }
+.dfl-loading-title { font-size: 12.5px; font-weight: 600; color: var(--dfl-ink-2); line-height: 1.45; }
+.dfl-loading-track { width: 196px; height: 4px; border-radius: 999px; background: var(--dfl-border-soft); overflow: hidden; }
+.dfl-loading-fill { height: 100%; border-radius: 999px; background: var(--dfl-accent); transition: width 240ms ease; }
+.dfl-loading-eta { margin: 0; font-size: 11px; color: var(--dfl-accent); font-variant-numeric: tabular-nums; font-weight: 500; }
+@keyframes dfl-spin { to { transform: rotate(360deg); } }
 .dfl-foot {
-  flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 7px 13px; border-top: 0.5px solid var(--dsw-alias-border-l3); font-size: 10.5px; color: var(--dsw-alias-label-tertiary);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 10px;
+  border-top: 1px solid var(--dfl-border-soft);
+  font-size: 10.5px;
+  color: var(--dfl-ink-3);
+  background: var(--dfl-bg-canvas);
 }
-.dfl-foot-count { flex: none; }
+.dfl-foot-count { flex: none; font-variant-numeric: tabular-nums; }
 .dfl-foot-path { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; min-width: 0; }
-.dfl-foot-back { flex: none; }
-.dfl-warning { padding: 6px 13px; font-size: 10.5px; color: var(--dsw-alias-state-error-primary); border-top: 0.5px solid var(--dsw-alias-border-l3); }
+.dfl-warning { padding: 6px 12px; font-size: 11px; color: var(--dfl-danger); border-top: 1px solid var(--dfl-border-soft); }
 .dfl-toast {
-  position: absolute; left: 12px; right: 12px; bottom: 38px; z-index: 5; padding: 7px 10px; border-radius: 8px;
-  background: rgba(24, 26, 32, 0.94); color: #fff; font-size: 11.5px; line-height: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24); pointer-events: none;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  z-index: 10010;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--dfl-ink);
+  color: var(--dfl-bg-card);
+  font-size: 11.5px;
+  line-height: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+  max-width: 90%;
+  text-align: center;
 }
-.dfl-source-chips { padding-top: 1px; }
-.dfl-archived-chip { border-color: color-mix(in srgb, #6b46c1 28%, transparent) !important; }
+
+/* ── frosted context menu ── */
 .dfl-context-layer { position: fixed; inset: 0; z-index: 10002; }
 .dfl-context-menu {
   position: fixed; z-index: 10003; overflow-y: auto; overscroll-behavior: contain;
-  padding: 5px; border-radius: 10px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary);
-  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.28); font-size: 12px; line-height: 18px;
+  padding: 5px; border-radius: 12px; border: 0.5px solid var(--dfl-border);
+  background: color-mix(in srgb, var(--dfl-bg-card) 95%, transparent);
+  backdrop-filter: blur(14px); color: var(--dfl-ink);
+  box-shadow: var(--dfl-popover-shadow); font-size: 12px; line-height: 18px;
 }
-.dfl-context-head { padding: 6px 8px 8px; border-bottom: 0.5px solid var(--dsw-alias-border-l3); }
+.dfl-context-head { padding: 6px 8px 7px; border-bottom: 0.5px solid var(--dfl-border-soft); }
+.dfl-context-head-row { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.dfl-context-head-meta { min-width: 0; flex: 1; }
 .dfl-context-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-context-path { margin-top: 2px; font-size: 10px; color: var(--dsw-alias-label-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
-.dfl-context-group { padding: 4px 0; border-top: 0.5px solid var(--dsw-alias-border-l3); }
+.dfl-context-path { margin-top: 1px; font-size: 10px; color: var(--dfl-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
+.dfl-context-group { padding: 4px 0; border-top: 0.5px solid var(--dfl-border-soft); }
 .dfl-context-group:first-of-type { border-top: 0; }
-.dfl-context-label { padding: 3px 8px; font-size: 10px; color: var(--dsw-alias-label-tertiary); }
-.dfl-context-note { padding: 3px 8px; font-size: 11px; color: var(--dsw-alias-label-tertiary); }
+.dfl-context-label { padding: 3px 8px 2px; font-size: 10px; font-weight: 600; color: var(--dfl-ink-3); }
+.dfl-context-note { padding: 3px 8px; font-size: 11px; color: var(--dfl-ink-3); }
 .dfl-menu-item {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  width: 100%; padding: 6px 8px; border: 0; border-radius: 6px;
+  width: 100%; padding: 6px 8px; border: 0; border-radius: 7px;
   background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
-.dfl-menu-item:hover { background: var(--dsw-alias-interactive-bg-hover); }
-.dfl-menu-item.is-danger { color: var(--dsw-alias-state-error-primary); }
+.dfl-menu-item:hover, .dfl-menu-item:focus-visible { background: var(--dfl-hover); outline: none; }
+.dfl-menu-item.is-danger { color: var(--dfl-danger); }
+.dfl-menu-item.is-danger:hover { background: color-mix(in srgb, var(--dfl-danger) 10%, transparent); }
 .dfl-context-danger { margin-top: 2px; }
 .dfl-app-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dfl-app-default { flex: none; font-size: 10px; color: var(--dsw-alias-label-tertiary); }
+.dfl-app-default {
+  flex: none; padding: 0 5px; border-radius: 4px;
+  background: var(--dfl-bg-subtle); color: var(--dfl-ink-3); font-size: 10px; line-height: 16px;
+}
+
+/* ── structured confirm & trace modals ── */
 .dfl-confirm-modal {
   position: fixed; inset: 0; z-index: 10004; display: flex; align-items: center; justify-content: center;
-  padding: 24px; background: rgba(12, 14, 19, 0.62);
+  padding: 20px; background: rgba(9, 11, 16, 0.54); backdrop-filter: blur(4px);
 }
 .dfl-confirm-card {
-  width: min(390px, 92vw); padding: 16px; border-radius: 12px;
-  border: 0.5px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-base);
-  color: var(--dsw-alias-label-primary); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  width: min(410px, 92vw); overflow: hidden; border-radius: 13px;
+  border: 0.5px solid var(--dfl-border); background: var(--dfl-bg-card);
+  color: var(--dfl-ink); box-shadow: var(--dfl-popover-shadow);
   font-size: 12px; line-height: 19px;
 }
-.dfl-confirm-title { font-size: 14px; font-weight: 600; }
-.dfl-confirm-name { margin-top: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-confirm-text { margin: 6px 0 0; color: var(--dsw-alias-label-secondary); }
-.dfl-confirm-warning { margin: 6px 0 0; color: var(--dsw-alias-state-warning-primary); }
-.dfl-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
-.dfl-button.is-danger { color: var(--dsw-alias-state-error-primary); border-color: var(--dsw-alias-state-error-primary); }
+.dfl-trace-card { width: min(540px, 94vw); padding: 16px; }
+.dfl-modal-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 12px 15px; border-bottom: 0.5px solid var(--dfl-border-soft);
+}
+.dfl-modal-title-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.dfl-modal-danger-icon {
+  width: 24px; height: 24px; border-radius: 7px; flex: none;
+  background: color-mix(in srgb, var(--dfl-danger) 12%, transparent);
+  color: var(--dfl-danger); display: inline-grid; place-items: center;
+}
+.dfl-modal-close {
+  width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--dfl-ink-3); cursor: pointer; display: grid; place-items: center;
+}
+.dfl-modal-close:hover { background: var(--dfl-hover); color: var(--dfl-ink); }
+.dfl-modal-body { padding: 14px 15px; }
+.dfl-confirm-title { font-size: 13.5px; font-weight: 600; }
+.dfl-confirm-file-pill {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: 8px; border: 0.5px solid var(--dfl-border-soft); background: var(--dfl-bg-canvas);
+}
+.dfl-confirm-file-info { min-width: 0; flex: 1; }
+.dfl-confirm-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-confirm-path { font-size: 10.5px; color: var(--dfl-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
+.dfl-confirm-text { margin: 10px 0 0; color: var(--dfl-ink-2); }
+.dfl-confirm-warning {
+  margin: 10px 0 0; padding: 8px 10px; border-radius: 8px;
+  background: color-mix(in srgb, var(--dfl-warning) 10%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--dfl-warning) 28%, transparent);
+  color: var(--dfl-warning); font-size: 11.5px; line-height: 17px;
+}
+.dfl-confirm-actions {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 10px 15px; border-top: 0.5px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-canvas);
+}
+.dfl-trace-card .dfl-confirm-actions { background: transparent; padding: 12px 0 0; margin-top: 12px; }
+.dfl-trace-path { margin-top: 6px; color: var(--dfl-ink-3); font-size: 11px; word-break: break-all; }
+.dfl-trace-grid {
+  display: flex; flex-direction: column; gap: 7px; margin-top: 12px; padding: 10px 12px;
+  border-radius: 9px; border: 0.5px solid var(--dfl-border-soft); background: var(--dfl-bg-canvas);
+}
+.dfl-trace-row { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 11.5px; }
+.dfl-trace-row > span { color: var(--dfl-ink-3); }
+.dfl-trace-row > code { color: var(--dfl-ink-2); word-break: break-all; white-space: pre-wrap; max-height: 96px; overflow: auto; }
+
+/* ── inline reader modal viewer ── */
 .dfl-viewer-modal {
   position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;
-  padding: 24px; background: rgba(12, 14, 19, 0.66);
+  padding: 20px; background: rgba(9, 11, 16, 0.62); backdrop-filter: blur(5px);
 }
 .dfl-viewer {
-  width: min(1180px, 94vw); height: min(860px, 90vh); display: flex; flex-direction: column;
-  overflow: hidden; border-radius: 12px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary);
-  font-size: 13px; line-height: 20px; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+  width: min(1160px, 94vw); height: min(860px, 90vh); display: flex; flex-direction: column;
+  overflow: hidden; border-radius: 14px; border: 0.5px solid var(--dfl-border);
+  background: var(--dfl-bg-card); color: var(--dfl-ink);
+  font-size: 13px; line-height: 20px; box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
 }
 .dfl-viewer-head {
-  flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  padding: 8px 10px; border-bottom: 0.5px solid var(--dsw-alias-border-l3);
+  flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 12px; border-bottom: 0.5px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-card);
 }
 .dfl-viewer-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.dfl-viewer-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-viewer-count { flex: none; font-size: 10px; color: var(--dsw-alias-label-tertiary); }
-.dfl-viewer-actions { display: flex; align-items: center; gap: 2px; flex: none; }
-.dfl-viewer-button {
-  width: 26px; height: 26px; border: 0; border-radius: 7px; background: transparent;
-  color: var(--dsw-alias-label-secondary); font: inherit; font-size: 16px; line-height: 1; cursor: pointer;
-  display: grid; place-items: center;
+.dfl-viewer-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-viewer-count {
+  flex: none; padding: 0 6px; border-radius: 999px; background: var(--dfl-bg-subtle);
+  font-size: 10.5px; color: var(--dfl-ink-3); font-variant-numeric: tabular-nums;
 }
-.dfl-viewer-button:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-viewer-button:disabled { opacity: 0.3; cursor: default; }
+.dfl-viewer-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+.dfl-viewer-seg {
+  display: inline-flex; align-items: center; padding: 2px; gap: 1px;
+  border-radius: 8px; border: 0.5px solid var(--dfl-border-soft); background: var(--dfl-bg-subtle);
+}
+.dfl-viewer-button {
+  width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--dfl-ink-2); font: inherit; font-size: 15px; line-height: 1; cursor: pointer;
+  display: inline-grid; place-items: center;
+}
+.dfl-viewer-button:hover:not(:disabled) { background: var(--dfl-bg-card); color: var(--dfl-ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); }
+.dfl-viewer-button:disabled { opacity: 0.32; cursor: default; }
+.dfl-viewer-button.is-close { width: 26px; height: 26px; border-radius: 7px; }
+.dfl-viewer-button.is-close:hover { background: var(--dfl-hover); box-shadow: none; }
+.dfl-viewer-toolbar {
+  flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+  border-bottom: 0.5px solid var(--dfl-border-soft); background: var(--dfl-bg-canvas);
+}
+.dfl-viewer-pagecount { min-width: 56px; padding: 0 4px; text-align: center; color: var(--dfl-ink-2); font-size: 11px; font-variant-numeric: tabular-nums; }
+.dfl-viewer-fit {
+  height: 24px; padding: 0 8px; border: 0; border-radius: 6px;
+  background: transparent; color: var(--dfl-ink-2);
+  font: inherit; font-size: 11px; font-weight: 500; cursor: pointer; max-width: 110px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dfl-viewer-fit:hover { background: var(--dfl-bg-card); color: var(--dfl-ink); }
+.dfl-viewer-fit[aria-pressed="true"] { background: var(--dfl-bg-card); color: var(--dfl-accent); font-weight: 600; }
+.dfl-viewer-link {
+  margin-left: auto; height: 26px; padding: 0 9px;
+  border: 0.5px solid var(--dfl-border); border-radius: 7px;
+  background: var(--dfl-bg-card); color: var(--dfl-ink-2);
+  font: inherit; font-size: 11px; font-weight: 500; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.dfl-viewer-link:hover { background: var(--dfl-hover); color: var(--dfl-ink); }
+.dfl-viewer-note { color: var(--dfl-ink-3); font-size: 10.5px; white-space: nowrap; }
 .dfl-viewer-body {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
-  overflow: auto; background: var(--dsw-alias-bg-layer-2);
+  overflow: auto; background: var(--dfl-bg-card); position: relative; z-index: 1;
 }
+.dfl-viewer-body.is-stage { background: var(--dfl-viewer-stage); }
 .dfl-viewer-text-banner {
-  flex: none; padding: 6px 12px; border-bottom: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary); font-size: 11px;
+  flex: none; padding: 7px 14px; border-bottom: 0.5px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-canvas); color: var(--dfl-ink-2); font-size: 11px;
 }
-.dfl-viewer-toolbar {
-  flex: none; display: flex; align-items: center; gap: 5px; padding: 6px 12px;
-  border-bottom: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base);
-}
-.dfl-viewer-pagecount { min-width: 64px; text-align: center; color: var(--dsw-alias-label-secondary); font-size: 11px; }
-.dfl-viewer-sep { width: 0.5px; height: 18px; margin: 0 5px; background: var(--dsw-alias-border-l3); }
-.dfl-viewer-fit {
-  height: 26px; padding: 0 8px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 6px;
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 11px; cursor: pointer; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.dfl-viewer-fit[aria-pressed="true"] { border-color: var(--dsw-alias-state-business-primary); color: var(--dsw-alias-state-business-primary); }
-.dfl-viewer-link { margin-left: auto; border: 0; background: transparent; color: var(--dsw-alias-state-business-primary); font: inherit; font-size: 11px; cursor: pointer; }
-.dfl-viewer-note { color: var(--dsw-alias-label-tertiary); font-size: 10px; white-space: nowrap; }
 .dfl-pdf-scroll {
   width: 100%; height: 100%; overflow: auto; align-self: stretch;
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
-  padding: 16px; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  padding: 20px; box-sizing: border-box;
 }
 .dfl-pdf-page {
   flex: none; position: relative; background: #fff;
-  border-radius: 3px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.16);
+  border-radius: 6px; border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14); overflow: hidden;
 }
 .dfl-pdf-page img { display: block; width: 100%; height: auto; }
 .dfl-pdf-page-number {
-  position: absolute; right: 8px; bottom: 8px; padding: 1px 5px; border-radius: 4px;
-  background: rgba(0, 0, 0, 0.38); color: #fff; font-size: 10px; line-height: 15px;
+  position: absolute; right: 10px; bottom: 10px; padding: 1px 6px; border-radius: 5px;
+  background: rgba(15, 23, 42, 0.56); backdrop-filter: blur(4px);
+  color: #fff; font-size: 10px; line-height: 16px; font-variant-numeric: tabular-nums;
 }
-.dfl-viewer-frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+.dfl-image-stage {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
 .dfl-viewer-image {
-  max-width: calc(100% - 24px); max-height: calc(100% - 24px); object-fit: contain; display: block; margin: auto;
-  border-radius: 6px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  max-width: 100%; max-height: 100%; object-fit: contain; display: block;
+  border-radius: 8px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.24);
 }
 .dfl-viewer-text {
-  margin: 0; padding: 12px; width: 100%; height: 100%; overflow: auto; box-sizing: border-box;
-  white-space: pre-wrap; word-break: break-word; font: 12px/18px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color: var(--dsw-alias-label-primary);
+  margin: 0; padding: 16px 20px; width: 100%; height: 100%; overflow: auto; box-sizing: border-box;
+  white-space: pre-wrap; word-break: break-word; font: 12.5px/19px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--dfl-ink);
 }
 .dfl-viewer-status {
-  display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 22px; text-align: center;
-  color: var(--dsw-alias-label-secondary); font-size: 12px;
+  margin: auto; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 28px 22px; text-align: center; color: var(--dfl-ink-2); font-size: 12px;
 }
-.dfl-viewer-status .dfl-empty-title { color: var(--dsw-alias-label-primary); }
+.dfl-viewer-status .dfl-empty-title { color: var(--dfl-ink); }
 .dfl-viewer-status .dfl-empty-text { word-break: break-word; }
 .dfl-viewer-foot {
   flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 6px 10px; border-top: 0.5px solid var(--dsw-alias-border-l3); font-size: 10px; color: var(--dsw-alias-label-tertiary);
+  padding: 7px 12px; border-top: 0.5px solid var(--dfl-border-soft);
+  background: var(--dfl-bg-canvas); font-size: 10.5px; color: var(--dfl-ink-3);
 }
+.dfl-viewer-hint { flex: none; white-space: nowrap; }
 .dfl-viewer-path { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; min-width: 0; }
+
+/* ── host header / composer / title entries ── */
 .dfl-title-chip { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
 .dfl-header-entry {
-  width: 24px; height: 24px; padding: 0; border: 0; border-radius: 7px;
+  width: 26px; height: 26px; padding: 0; border: 0; border-radius: 7px;
   display: inline-flex; align-items: center; justify-content: center;
   background: transparent; color: var(--dsw-alias-label-secondary); cursor: pointer;
 }
 .dfl-header-entry:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
 .dfl-header-entry:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: 1px; }
 .dfl-composer-entry {
-  height: 24px; max-width: 96px; padding: 0 8px; border: 0; border-radius: 999px;
+  height: 26px; max-width: 96px; padding: 0 8px; border: 0; border-radius: 999px;
   display: inline-flex; align-items: center; gap: 4px; background: transparent;
   color: var(--dsw-alias-label-secondary); font: inherit; font-size: 12px; cursor: pointer;
 }
 .dfl-composer-entry:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
 .dfl-composer-entry:focus-visible { outline: 2px solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: 1px; }
 .dfl-composer-entry-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dfl-settings { max-width: 760px; color: var(--dsw-alias-label-primary); font-size: 13px; line-height: 20px; }
-.dfl-settings-heading h2 { margin: 0 0 2px; font-size: 16px; }
-.dfl-settings-heading p { margin: 0 0 14px; color: var(--dsw-alias-label-tertiary); font-size: 11px; }
-.dfl-settings-card { margin-bottom: 12px; padding: 12px 14px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 10px; background: var(--dsw-alias-bg-layer-1); }
-.dfl-settings-card h3 { margin: 0 0 8px; font-size: 12px; color: var(--dsw-alias-label-secondary); }
-.dfl-settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 32px; padding: 3px 0; }
-.dfl-settings-label { display: flex; flex-direction: column; gap: 1px; }
-.dfl-settings-hint { color: var(--dsw-alias-label-tertiary); font-size: 10px; }
+
+/* ── card-based settings page ── */
+.dfl-settings { max-width: 720px; color: var(--dfl-ink); font-size: 13px; line-height: 20px; }
+.dfl-settings-heading h2 { margin: 0 0 3px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.dfl-settings-heading p { margin: 0 0 14px; color: var(--dfl-ink-3); font-size: 11.5px; }
+.dfl-settings-card {
+  margin-bottom: 12px; padding: 12px 15px; border: 0.5px solid var(--dfl-border);
+  border-radius: 12px; background: var(--dfl-bg-card); box-shadow: var(--dfl-card-shadow);
+}
+.dfl-settings-card h3 {
+  margin: 0 0 8px; font-size: 11.5px; font-weight: 600;
+  color: var(--dfl-ink-3); text-transform: uppercase; letter-spacing: 0.03em;
+}
+.dfl-settings-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 36px; padding: 6px 0; border-top: 0.5px solid var(--dfl-border-soft);
+}
+.dfl-settings-card h3 + .dfl-settings-row { border-top: 0; padding-top: 2px; }
+.dfl-settings-label { display: flex; flex-direction: column; gap: 1px; font-size: 12.5px; font-weight: 500; }
+.dfl-settings-hint { color: var(--dfl-ink-3); font-size: 11px; font-weight: 400; }
 .dfl-settings-row input[type="number"], .dfl-settings-row select {
-  width: 130px; height: 28px; padding: 0 7px; border: 0.5px solid var(--dsw-alias-border-l3);
-  border-radius: 7px; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary);
+  width: 136px; height: 30px; padding: 0 8px; border: 0.5px solid var(--dfl-border);
+  border-radius: 8px; background: var(--dfl-bg-canvas); color: var(--dfl-ink);
   font: inherit; font-size: 12px;
 }
-.dfl-settings-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--dsw-alias-state-business-primary); }
+.dfl-settings-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--dfl-accent); }
 .dfl-settings-text-wrap { display: flex; align-items: center; gap: 6px; flex: 1; max-width: 340px; }
 .dfl-settings-text {
-  flex: 1; min-width: 0; height: 30px; border-radius: 8px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; padding: 0 8px;
+  flex: 1; min-width: 0; height: 30px; border-radius: 8px; border: 0.5px solid var(--dfl-border);
+  background: var(--dfl-bg-canvas); color: var(--dfl-ink); font: inherit; font-size: 12px; padding: 0 9px;
 }
 .dfl-settings-clear {
-  height: 30px; padding: 0 10px; border-radius: 8px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px; cursor: pointer;
+  height: 30px; padding: 0 10px; border-radius: 8px; border: 0.5px solid var(--dfl-border);
+  background: var(--dfl-bg-card); color: var(--dfl-ink-2); font: inherit; font-size: 11px; cursor: pointer;
 }
-.dfl-settings-clear:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.dfl-settings-path { display: flex; gap: 12px; padding: 3px 0; font-size: 11px; }
-.dfl-settings-path span { flex: none; width: 90px; color: var(--dsw-alias-label-tertiary); }
-.dfl-settings-path code { min-width: 0; color: var(--dsw-alias-label-secondary); word-break: break-all; }
+.dfl-settings-clear:hover { background: var(--dfl-hover); color: var(--dfl-ink); }
+.dfl-settings-path { display: flex; gap: 12px; padding: 4px 0; font-size: 11px; }
+.dfl-settings-path span { flex: none; width: 92px; color: var(--dfl-ink-3); }
+.dfl-settings-path code { min-width: 0; color: var(--dfl-ink-2); word-break: break-all; }
 .dfl-settings-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
-.dfl-settings-status { margin-right: auto; color: var(--dsw-alias-label-tertiary); font-size: 11px; }
+.dfl-settings-status { margin-right: auto; color: var(--dfl-ink-3); font-size: 11px; }
 .dfl-settings-save {
-  height: 30px; padding: 0 14px; border: 0; border-radius: 8px;
-  background: var(--dsw-alias-state-business-primary); color: #fff; font: inherit; font-size: 12px; cursor: pointer;
+  height: 32px; padding: 0 16px; border: 0; border-radius: 8px;
+  background: var(--dfl-accent); color: #fff; font: inherit; font-size: 12px; font-weight: 550; cursor: pointer;
 }
-.dfl-settings-save:disabled { opacity: 0.55; cursor: default; }
-.dfl-settings-loading { display: flex; align-items: center; gap: 8px; padding: 20px; color: var(--dsw-alias-label-tertiary); }
+.dfl-settings-save:hover:not(:disabled) { filter: brightness(1.06); }
+.dfl-settings-save:disabled { opacity: 0.5; cursor: default; }
+.dfl-settings-loading { display: flex; align-items: center; gap: 8px; padding: 20px; color: var(--dfl-ink-3); }
 .dfl-settings .dfl-spinner { width: 14px; height: 14px; }
-/* ── appearance: theme (follow DSH / light / dark / system) ── */
-.dfl-theme {
-  color: var(--dsw-alias-label-primary);
-}
-.dfl-theme[data-dfl-scheme="light"],
-html[data-dfl-theme="light"] .dfl-theme {
-  color-scheme: light;
-  --dsw-alias-bg-base: #f5f7fb;
-  --dsw-alias-bg-layer-1: #ffffff;
-  --dsw-alias-bg-layer-2: #eef1f7;
-  --dsw-alias-border-l3: rgba(15, 23, 42, 0.13);
-  --dsw-alias-label-primary: #101828;
-  --dsw-alias-label-secondary: #475467;
-  --dsw-alias-label-tertiary: #7b8798;
-  --dsw-alias-label-caption: #98a2b3;
-  --dsw-alias-interactive-bg-hover: rgba(15, 23, 42, 0.055);
-  --dsw-alias-interactive-bg-active: rgba(15, 23, 42, 0.09);
-  --dsw-alias-state-business-primary: #2563eb;
-  --dsw-alias-state-error-primary: #d92d20;
-  --dsw-alias-state-warning-primary: #b54708;
-  --dsw-focus-ring-color: #2563eb;
-  color: var(--dsw-alias-label-primary);
-}
-.dfl-theme[data-dfl-scheme="dark"],
-html[data-dfl-theme="dark"] .dfl-theme {
-  color-scheme: dark;
-  --dsw-alias-bg-base: #0d1117;
-  --dsw-alias-bg-layer-1: #151b24;
-  --dsw-alias-bg-layer-2: #1b2430;
-  --dsw-alias-border-l3: rgba(255, 255, 255, 0.13);
-  --dsw-alias-label-primary: #e8eef7;
-  --dsw-alias-label-secondary: #aeb9c8;
-  --dsw-alias-label-tertiary: #8492a6;
-  --dsw-alias-label-caption: #6f7d90;
-  --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.07);
-  --dsw-alias-interactive-bg-active: rgba(255, 255, 255, 0.12);
-  --dsw-alias-state-business-primary: #60a5fa;
-  --dsw-alias-state-error-primary: #f97066;
-  --dsw-alias-state-warning-primary: #fdb022;
-  --dsw-focus-ring-color: #60a5fa;
-}
-.dfl-root.dfl-theme { background: var(--dsw-alias-bg-base); }
 .dfl-settings-row.dfl-settings-theme-row { align-items: flex-start; }
-.dfl-theme-picker { display: grid; grid-template-columns: repeat(2, minmax(76px, 1fr)); gap: 6px; width: 214px; }
-.dfl-theme-option {
-  height: 30px; padding: 0 8px; border: 0.5px solid var(--dsw-alias-border-l3);
-  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary);
-  font: inherit; font-size: 11px; cursor: pointer;
+.dfl-theme-picker {
+  display: grid; grid-template-columns: repeat(2, minmax(84px, 1fr)); gap: 5px; width: 224px;
+  padding: 4px; border-radius: 10px; background: var(--dfl-bg-subtle); border: 0.5px solid var(--dfl-border-soft);
 }
-.dfl-theme-option:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.dfl-theme-option {
+  height: 28px; padding: 0 8px; border: 0; border-radius: 7px;
+  background: transparent; color: var(--dfl-ink-2);
+  font: inherit; font-size: 11.5px; font-weight: 500; cursor: pointer;
+  transition: background-color 120ms, color 120ms, box-shadow 120ms;
+}
+.dfl-theme-option:hover { background: var(--dfl-hover); color: var(--dfl-ink); }
 .dfl-theme-option.is-active {
-  color: #fff; background: var(--dsw-alias-state-business-primary);
-  border-color: transparent;
+  color: var(--dfl-ink); background: var(--dfl-bg-card); font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 0.5px var(--dfl-border-soft);
 }
 .dfl-theme[data-dfl-scheme="dark"] .dfl-theme-option.is-active,
-html[data-dfl-theme="dark"] .dfl-theme-option.is-active { color: #08111f; }
-.dfl-theme[data-dfl-scheme="dark"] .dfl-toast,
-body[data-ds-dark-theme] .dfl-toast { background: rgba(245, 246, 250, 0.96); color: #111318; }
-@media (max-width: 460px) { .dfl-icon-button { display: none; } }
-@media (prefers-reduced-motion: reduce) { .dfl-spinner { animation-duration: 2.4s; } }
+html[data-dfl-theme="dark"] .dfl-theme .dfl-theme-option.is-active { color: var(--dfl-ink); }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-filter-active-count,
+html[data-dfl-theme="dark"] .dfl-theme .dfl-filter-active-count,
+body[data-ds-dark-theme] .dfl-filter-active-count { color: #08111f; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-button.is-primary,
+.dfl-theme[data-dfl-scheme="dark"] .dfl-settings-save,
+html[data-dfl-theme="dark"] .dfl-theme .dfl-button.is-primary,
+html[data-dfl-theme="dark"] .dfl-theme .dfl-settings-save,
+body[data-ds-dark-theme] .dfl-button.is-primary,
+body[data-ds-dark-theme] .dfl-settings-save { background: #2563eb; color: #fff; }
+.dfl-theme[data-dfl-scheme="dark"] .dfl-button.is-danger,
+html[data-dfl-theme="dark"] .dfl-theme .dfl-button.is-danger,
+body[data-ds-dark-theme] .dfl-button.is-danger { background: #dc2626; color: #fff; }
+
+@media (max-width: 390px) {
+  .dfl-row-act-btn { padding: 0 5px; font-size: 10.5px; }
+  .dfl-open-button { padding: 0 6px; font-size: 10.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .dfl-spinner, .dfl-refresh-btn.is-loading svg { animation-duration: 2.4s; } }
 `
 
     return {
@@ -3635,8 +5699,9 @@ body[data-ds-dark-theme] .dfl-toast { background: rgba(245, 246, 250, 0.96); col
       apply,
       __internals: {
         NS, KIND, ID, CSS, zh, en,
+        CATEGORY_ORDER,
         fileAddressFor, referenceText, categoryOf, extensionLabel,
-        fileRowKey, isImageFile, canPanelPreview, themeAttributes, EXTENSION_CATEGORY,
+        isReadableFile, fileRowKey, isImageFile, canPanelPreview, themeAttributes, EXTENSION_CATEGORY,
         readLocalAppearance, writeLocalAppearance, applyDocumentTheme,
       },
     }

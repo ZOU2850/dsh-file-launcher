@@ -99,6 +99,7 @@ try {
     [join(root, 'final.pdf'), 2400],
     [join(root, 'notes.md'), 80],
     [join(root, 'attachment.zip'), 300],
+    [join(root, 'index.js'), 120],
     [imageObject, 4],
     [join(root, 'note.pdf'), 500],
   ])
@@ -201,8 +202,12 @@ try {
   assert.ok(sentResult.files.some(file => file.name === 'deleted.pdf' && file.missing === true))
   assert.ok(sentResult.files.some(file => file.isFolder === true))
   assert.ok(sentResult.files.some(file => file.name === 'note.pdf' && file.reference === true))
+  assert.ok(sentResult.files.every(file => file.sessionTitle === 'Test conversation' && file.projectName === baseName(root)), 'sent files must carry hydrated projectName and sessionTitle')
   const projectResult = await inventory.inventory({ sessionId: 's1', scope: 'project' })
-  assert.ok(projectResult.files.length >= 3)
+  assert.ok(projectResult.files.length >= 4)
+  assert.ok(projectResult.files.some(file => file.name === 'index.js' && file.category === 'code'), 'project scope must include workspace code files')
+  assert.equal(categoryOf('a.json'), 'code')
+  assert.equal(categoryOf({ name: 'folder', isFolder: true }), 'folder')
 
   /* ── archive root portability, write queue & tombstones ── */
   const savedEnvArchive = process.env.DSH_FILE_LAUNCHER_ARCHIVE_DIR
@@ -355,7 +360,32 @@ try {
   }
   applyHost(hostCtx)
   assert.equal(registeredTools.length, 1)
-  assert.ok(registeredRoutes.length >= 10)
+  assert.ok(registeredRoutes.length >= 12)
+  const appsRoute = registeredRoutes.find(route => route.path === '/api/file-launcher.apps')
+  const openAppRoute = registeredRoutes.find(route => route.path === '/api/file-launcher.open-app')
+  assert.ok(appsRoute && openAppRoute, 'apps discovery and open-app routes must be registered')
+  const appsRes = await appsRoute.fetch(new Request(`http://localhost/api/file-launcher.apps?path=${encodeURIComponent(join(root, 'report.docx'))}`))
+  const appsPayload = await appsRes.json()
+  assert.equal(appsRes.status, 200)
+  assert.equal(appsPayload.ok, true)
+  assert.ok(Array.isArray(appsPayload.apps))
+  assert.ok(!appsPayload.apps.some(app => /7-?zip|winrar/i.test(app.name || app.id)), 'extension matcher must exclude unrelated apps')
+  const hookAppsRes = await appsRoute.fetch(new Request(`http://localhost/api/file-launcher.apps?path=${encodeURIComponent(join(root, '.githooks', 'post-commit'))}`))
+  const hookAppsPayload = await hookAppsRes.json()
+  assert.equal(hookAppsRes.status, 200)
+  assert.equal(hookAppsPayload.ok, true)
+  if (process.platform === 'win32') {
+    assert.ok(hookAppsPayload.apps.length >= 1, 'extensionless/dotfile files must still match at least one desktop editor/notepad')
+  }
+  const healthRoute = registeredRoutes.find(route => route.path === '/api/file-launcher.health')
+  const healthPayload = await (await healthRoute.fetch(new Request('http://localhost/api/file-launcher.health'))).json()
+  assert.equal(healthPayload.capabilities?.apps, true)
+  const badOpenRes = await openAppRoute.fetch(new Request('http://localhost/api/file-launcher.open-app', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ path: join(root, 'report.docx'), appId: 'untrusted-app-id' }),
+  }))
+  assert.equal(badOpenRes.status, 404, 'open-app must reject unknown app IDs outside detected allowlist')
   for (const dispose of cleanupCallbacks) dispose()
   assert.equal(registeredTools.length, 0, 'host dispose must unregister tool cleanly')
   assert.equal(registeredRoutes.length, 0, 'host dispose must unregister all routes cleanly')

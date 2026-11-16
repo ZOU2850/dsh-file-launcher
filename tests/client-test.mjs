@@ -157,6 +157,13 @@ for (const [extWithDot, category] of CATEGORY_BY_EXTENSION.entries()) {
   assert.equal(internals.EXTENSION_CATEGORY[ext], category, `client category mismatch for ${extWithDot}`)
 }
 assert.equal(Object.keys(internals.EXTENSION_CATEGORY).length, CATEGORY_BY_EXTENSION.size)
+assert.equal(internals.categoryOf('pkg.json'), 'code')
+assert.equal(internals.categoryOf({ name: 'src', isFolder: true }), 'folder')
+assert.ok(Array.isArray(internals.CATEGORY_ORDER) && internals.CATEGORY_ORDER.indexOf('document') < internals.CATEGORY_ORDER.indexOf('code'))
+assert.equal(internals.isReadableFile({ name: 'report.docx', category: 'document', source: 'read' }), true)
+assert.equal(internals.isReadableFile({ name: 'app.js', category: 'code', source: 'read' }), false)
+assert.equal(internals.isReadableFile({ name: 'report.pdf', category: 'pdf', source: 'created' }), true)
+assert.equal(internals.isReadableFile({ name: 'app.js', category: 'code', source: 'delivered' }), true)
 
 assert.equal(internals.isImageFile({ name: 'pic.png', path: 'C:\\a\\pic.png' }), true)
 assert.equal(internals.isImageFile({ name: 'pic.avif', path: 'C:\\a\\pic.avif' }), true)
@@ -200,8 +207,37 @@ const enKeys = Object.keys(internals.en).sort()
 assert.deepEqual(zhKeys, enKeys, 'zh and en dictionaries must carry the same keys')
 assert.ok(zhKeys.includes('settings.archiveDirCustom'))
 assert.ok(zhKeys.includes('viewer.textTruncated'))
+assert.ok(zhKeys.includes('sort.timeAsc'))
+assert.ok(zhKeys.includes('group.flat'))
 assert.ok(internals.zh['viewer.truncated'].includes('{count}'))
 assert.ok(internals.en['viewer.truncated'].includes('{count}'))
 assert.ok(zhKeys.length > 40)
+
+// Redesigned Codex UI CSS invariants.
+for (const selector of [
+  '.dfl-scope-bar',
+  '.dfl-scope-proj-opt',
+  '.dfl-scope-nested-opt',
+  '.dfl-region-strip',
+  '.dfl-region-pill',
+  '.dfl-seg-tabs',
+  '.dfl-seg-tab',
+  '.dfl-cat-bar',
+  '.dfl-toolbar-row',
+  '.dfl-composite-bar',
+  '.dfl-group-badge',
+  '.dfl-row-act-btn',
+  '.dfl-row.is-reference',
+  '.dfl-star-btn',
+  '.dfl-filter-columns',
+  '.dfl-viewer-seg',
+  '.dfl-viewer-hint',
+  '.dfl-modal-head',
+]) {
+  assert.ok(internals.CSS.includes(selector), `CSS missing UI selector: ${selector}`)
+}
+const openBraces = (internals.CSS.match(/\{/g) || []).length
+const closeBraces = (internals.CSS.match(/\}/g) || []).length
+assert.equal(openBraces, closeBraces, 'CSS braces must stay balanced')
 
 console.log(`file-launcher client-test: ok (${zhKeys.length} locale keys)`)

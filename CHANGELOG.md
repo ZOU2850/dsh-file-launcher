@@ -6,6 +6,16 @@
 
 - **Reference origin and badge**: a user `@path` reference is shown under **User** / **Sent by me** with a clickable **引用 / Reference** badge and retains its source conversation, project, message sequence, timestamp, and excerpt. Right-click **追溯引用位置** opens the origin card.
 - The model-facing `file_launcher` tool marks reference rows with `referenced`.
+- **Desktop app auto-detection & extensionless fallback (`lib/apps.js`)**: automatically matches installed desktop software (Word/Excel/PPT, WPS Office modes, VS Code/Cursor/Trae/Notepad++, PDF readers, browsers, Notepad) using batched `App Paths` registry queries and per-extension `UserChoice`/`OpenWithProgids`, including fallback editor matching for extensionless files and dotfiles (e.g. `.gitignore`, `post-commit`), plus host capability diagnostics when the backend awaits reload.
+- **Reassuring loading state with ETA**: list loading (Conversation / Sent by me / Project) and document/PDF preview loaders display progressive reassuring messages, an animated progress bar, elapsed seconds, and dynamically calibrated time estimates.
+
+### Changed
+
+- **Antigravity Codex UI & scope isolation alignment**: switched inline row actions to clean `插入` / `复制引用` / `打开方式 ▾` controls; aligned 19+ file categories (including `code` in Project scope); kept **Sent by me** and **Pinned** grouped **Project → Conversation** by default while making the top isolation selector dynamically mirror the active bottom tab (`Conversation`, `Sent by me`, `Pinned`, `Project`).
+
+### Fixed
+
+- **Faster Project scope opening**: parallelized `scanWorkspace` directory traversal (`8` concurrent workers, `16` concurrent stat lookups, expanded `SKIP_NAMES` filter, 45s cache TTL), skipped redundant `scanQueue` waits when `scanCache` hits, ran `scanSession` + `scanWorkspace` concurrently when `cwd` is known, and stored prefetched project inventory directly into `dataCache` ahead of background `sent` scans.
 
 ## 1.4.3
 
