@@ -7,7 +7,7 @@
 
 import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readdir, readFile, rm, stat, utimes, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -403,6 +403,66 @@ try {
   const clientPkgInject = Array.isArray(pkg.dsh?.client?.inject) ? pkg.dsh.client.inject : []
   assert.ok(!clientPkgInject.includes('@deepseek-ai/dsh-client-ui-file-drag'))
   assert.ok(!clientPkgInject.includes('@deepseek-ai/dsh-client-ui-sidebar-documentpreview'))
+
+  /* ── real-disk local fast-path, mtime-first sort & live new-file detection ── */
+  const realWs = join(root, 'real-ws')
+  const buildDir = join(realWs, '_build')
+  const laterDir = join(realWs, 'z_deliverables')
+  await mkdir(buildDir, { recursive: true })
+  await mkdir(laterDir, { recursive: true })
+  const oldDate = new Date(Date.now() - 3600_000)
+  await Promise.all(Array.from({ length: 820 }, async (_, idx) => {
+    const p = join(buildDir, `gen-${idx}.py`)
+    await writeFile(p, 'pass')
+    await utimes(p, oldDate, oldDate)
+  }))
+  const newestDeliverable = join(laterDir, 'final-summary.docx')
+  await writeFile(newestDeliverable, 'docx-bytes')
+  const realFsAdapter = {
+    async resolve(target) { return target },
+    processPath(target) { return target },
+    async stat(target) {
+      const s = await stat(target)
+      return { type: s.isDirectory() ? 'directory' : 'file', size: s.size }
+    },
+    async listDir(target) {
+      const ents = await readdir(target, { withFileTypes: true })
+      return ents.map(e => ({
+        name: e.name,
+        type: e.isDirectory() ? 'directory' : 'file',
+        target: join(target, e.name),
+      }))
+    },
+  }
+  const realInv = new InventoryService({
+    get(name) {
+      if (name === 'fs') return realFsAdapter
+      if (name === 'sessionQuery') {
+        return {
+          async listSessions() { return [{ header: { id: 'real-s1', cwd: realWs } }] },
+          async observeSession() { return { header: { cwd: realWs }, events: [], [Symbol.dispose]() {} } },
+        }
+      }
+      return undefined
+    },
+  }, store)
+  try {
+    const firstScan = await realInv.inventory({ sessionId: 'real-s1', scope: 'project' })
+    assert.equal(firstScan.truncated, true)
+    assert.ok(
+      firstScan.files.some(row => row.name === 'final-summary.docx'),
+      'newest deliverable past 750 older _build files must not be dropped by cap truncation',
+    )
+    assert.equal(firstScan.files[0].name, 'final-summary.docx')
+
+    const freshFile = join(laterDir, 'just-created.md')
+    await writeFile(freshFile, '# brand new')
+    await new Promise(resolve => setTimeout(resolve, 180))
+    const nextScan = await realInv.inventory({ sessionId: 'real-s1', scope: 'project' })
+    assert.equal(nextScan.files[0].name, 'just-created.md', 'fs.watch invalidation + mtime sort must surface newly written file immediately')
+  } finally {
+    realInv.dispose()
+  }
 
   console.log('file-launcher self-test: ok')
 } finally {

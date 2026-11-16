@@ -43,6 +43,11 @@ export function apply(ctx) {
       toDisposer(registerRoutes(ctx, { inventory, store, version: VERSION })),
     ]
     return () => {
+      try {
+        inventory.dispose?.()
+      } catch {
+        // Ignore teardown errors during hot reload or host shutdown.
+      }
       for (const dispose of disposers.splice(0).reverse()) {
         try {
           dispose()

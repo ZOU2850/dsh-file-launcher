@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.5
+
+### Fixed
+
+- **Instant local workspace project opening (~99ms on 1,400+ files)**: `scanWorkspace` now verifies local disk roots against `ctx.fs` once and walks directories with 16 concurrent `node:fs/promises` workers + 24-concurrent `stat`, keeping mock/remote providers seamlessly on the `ctx.fs` fallback.
+- **Newest files never cut off (`_build` / large repo safety)**: collects up to 6,000 matching workspace candidates and sorts by `mtime` descending *before* applying the 750-row cap, so older build/code trees no longer hide newer deliverables in subsequent directories.
+- **Immediate capture of newly created files**: attaches recursive `fs.watch` invalidation (cleaned via `InventoryService.dispose()`), removes the 5-second `fresh=1` bypass guard in `scanSessionObserved`, listens to `sessionRow.updatedAt` / window focus / `pointerenter` / visibility in `client.js`, and tightens default visible polling to 10s.
+- **Large Office/PDF preview comfort & quick bypass**: caches rendered page previews in `viewerCacheRef` for instant reopening and adds **Open in default app now** / **Reveal file** buttons right inside the viewer loading card.
+
 ## 1.4.4
 
 ### Added

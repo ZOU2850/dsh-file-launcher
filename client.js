@@ -637,6 +637,10 @@ window.__ModuleLoader__.load({
         const loadingStartedAtRef = useRef(0)
         const viewerStartedAtRef = useRef(0)
         const scopeDurationRef = useRef({ session: 1200, sent: 3500, project: 1800, viewer: 2500 })
+        const viewerCacheRef = useRef(new Map())
+        const lastSessionUpdatedRef = useRef(Number(sessionRow?.updatedAt || 0))
+        const lastFocusSyncRef = useRef(0)
+        const forceFreshRef = useRef(false)
         const [error, setError] = useState('')
         const [query, setQuery] = useState('')
         const [category, setCategory] = useState('all')
@@ -851,7 +855,7 @@ window.__ModuleLoader__.load({
           if (scope !== 'sent' && !scopeMenuOpen && (data === null || loading)) return undefined
           let alive = true
           const controller = new AbortController()
-          const delayMs = scope === 'sent' || scopeMenuOpen ? 0 : 800
+          const delayMs = scope === 'sent' || scopeMenuOpen ? 0 : 1200
           const timer = setTimeout(() => {
             if (!alive) return
             const parameters = new URLSearchParams({
@@ -892,7 +896,7 @@ window.__ModuleLoader__.load({
           prevRefreshKeyRef.current = refreshKey
           const live = sameView && !manual && prevLiveTickRef.current !== liveTick
           prevLiveTickRef.current = liveTick
-          const cacheTtlMs = inventoryScope === 'project' ? 45_000 : 30_000
+          const cacheTtlMs = inventoryScope === 'project' ? 10_000 : 12_000
           const cached = dataCache.current.get(cacheKey)
           if (!live && cached !== undefined && Date.now() - cached.at < cacheTtlMs) {
             setData(cached.value)
@@ -905,17 +909,16 @@ window.__ModuleLoader__.load({
           const requestStartedAt = Date.now()
           loadingStartedAtRef.current = requestStartedAt
           setLoadElapsedMs(0)
-          setLoading(true)
+          if (!live) setLoading(true)
           setError('')
           const parameters = new URLSearchParams({
             sessionId: inventorySessionId,
             scope: inventoryScope,
             limit: String(preferences?.maxRows || 800),
           })
-          // Only an explicit user refresh forces a full host rescan; the
-          // auto-refresh timer reuses the host's short-lived scan cache so a
-          // huge Session log is never re-read every tick.
-          if (manual) parameters.set('fresh', '1')
+          const wantFresh = manual || (live && forceFreshRef.current)
+          forceFreshRef.current = false
+          if (wantFresh) parameters.set('fresh', '1')
           api(`/api/file-launcher.inventory?${parameters.toString()}`, { signal: controller.signal })
             .then(value => {
               if (!alive) return
@@ -1025,13 +1028,57 @@ window.__ModuleLoader__.load({
         useEffect(() => {
           if (viewer !== null) return undefined
           if (scope === 'pins') return undefined
-          const seconds = preferences && preferences.autoRefresh === false ? 0 : preferences ? preferences.refreshSeconds : 60
-          if (seconds <= 0) return undefined
+          const rawSeconds = preferences && preferences.autoRefresh === false ? 0 : preferences ? preferences.refreshSeconds : 60
+          if (rawSeconds <= 0) return undefined
+          const seconds = rawSeconds === 60 ? 10 : rawSeconds
           const timer = setInterval(() => {
+            forceFreshRef.current = true
             setLiveTick(value => value + 1)
           }, seconds * 1000)
           return () => clearInterval(timer)
         }, [scope, regionTarget, viewer, preferences])
+
+        /* Immediately capture newly generated files when the active conversation updates or panel regains focus. */
+        useEffect(() => {
+          const updated = Number(sessionRow?.updatedAt || 0)
+          if (updated <= 0 || updated === lastSessionUpdatedRef.current) return undefined
+          lastSessionUpdatedRef.current = updated
+          const timer = setTimeout(() => {
+            forceFreshRef.current = true
+            for (const key of [...dataCache.current.keys()]) {
+              if (key.includes(`:${sessionId}:`)) dataCache.current.delete(key)
+            }
+            setTabCounts(prev => {
+              const pKey = `${sessionId}:project`
+              if (prev[pKey] === undefined) return prev
+              const next = { ...prev }
+              delete next[pKey]
+              return next
+            })
+            setLiveTick(value => value + 1)
+          }, 220)
+          return () => clearTimeout(timer)
+        }, [sessionId, sessionRow?.updatedAt])
+
+        useEffect(() => {
+          if (scope === 'pins' || viewer !== null) return undefined
+          const triggerFresh = () => {
+            if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
+            const now = Date.now()
+            if (now - lastFocusSyncRef.current < 2500) return
+            lastFocusSyncRef.current = now
+            forceFreshRef.current = true
+            setLiveTick(value => value + 1)
+          }
+          window.addEventListener('focus', triggerFresh)
+          window.addEventListener('pointerenter', triggerFresh)
+          document.addEventListener('visibilitychange', triggerFresh)
+          return () => {
+            window.removeEventListener('focus', triggerFresh)
+            window.removeEventListener('pointerenter', triggerFresh)
+            document.removeEventListener('visibilitychange', triggerFresh)
+          }
+        }, [scope, viewer])
 
         /* Toast lifetime. */
         useEffect(() => {
@@ -1042,6 +1089,7 @@ window.__ModuleLoader__.load({
 
         /* Reset the drill-down when the Session changes. */
         useEffect(() => {
+          lastSessionUpdatedRef.current = 0
           setRegionTarget({ kind: 'current-session' })
           setData(null)
           setSentData(null)
@@ -1536,12 +1584,22 @@ window.__ModuleLoader__.load({
             throw new Error(result.error || t('viewer.renderFailed'))
           }
           viewerPageRefs.current = []
-          setViewerState({
+          const pagePayload = {
             status: 'pages',
-            file,
             pages: result.pages,
             totalPages: result.totalPages || result.pages.length,
             truncated: result.truncated === true,
+          }
+          if (file?.path) {
+            const vKey = `${file.path}:${file.size || 0}:${file.mtime || 0}`
+            viewerCacheRef.current.set(vKey, pagePayload)
+            while (viewerCacheRef.current.size > 8) {
+              viewerCacheRef.current.delete(viewerCacheRef.current.keys().next().value)
+            }
+          }
+          setViewerState({
+            ...pagePayload,
+            file,
             page: 0,
             fit: true,
             zoom: 1,
@@ -1587,6 +1645,13 @@ window.__ModuleLoader__.load({
           }
           const file = viewer.items[viewer.index]
           if (file === undefined) return undefined
+          const vKey = `${file.path}:${file.size || 0}:${file.mtime || 0}`
+          const cachedPages = viewerCacheRef.current.get(vKey)
+          if (cachedPages !== undefined) {
+            viewerPageRefs.current = []
+            setViewerState({ ...cachedPages, file, page: 0, fit: true, zoom: 1 })
+            return undefined
+          }
           const controller = new AbortController()
           let objectUrl
           const sourceSession = file.sessionId || inventorySessionId || sessionId
@@ -2857,7 +2922,18 @@ window.__ModuleLoader__.load({
           h('div', { className: 'dfl-loading-track', 'aria-hidden': true },
             h('div', { className: 'dfl-loading-fill', style: { width: `${pct}%` } })),
           h('p', { className: 'dfl-loading-eta' }, etaLine),
-          h('p', { className: 'dfl-empty-text' }, t('loading.comfort.hint')))
+          h('p', { className: 'dfl-empty-text' }, t(modeKey === 'viewer' ? 'viewer.comfort.hint' : 'loading.comfort.hint')),
+          modeKey === 'viewer' && file ? h('div', { className: 'dfl-empty-actions' },
+            canNative ? h('button', {
+              type: 'button',
+              className: 'dfl-button is-primary',
+              onClick: () => { void openNative(file) },
+            }, t('viewer.quickOpenNative')) : null,
+            canNative ? h('button', {
+              type: 'button',
+              className: 'dfl-button',
+              onClick: () => { void reveal(file) },
+            }, t('viewer.quickReveal')) : null) : null)
         }
 
         function renderFileList() {
@@ -3880,6 +3956,9 @@ window.__ModuleLoader__.load({
       'viewer.loading': '正在读取预览…',
       'viewer.converting': '正在转换 Office 文档…',
       'viewer.rendering': '正在渲染 PDF 页面…',
+      'viewer.comfort.hint': '文档较大时首次排版渲染约需 10–40 秒；想立即阅读也可点下方用本机软件秒开。',
+      'viewer.quickOpenNative': '用默认软件秒开',
+      'viewer.quickReveal': '定位原文件',
       'viewer.renderFailed': 'PDF 页面渲染失败',
       'viewer.officeUnavailable': 'Office 预览不可用',
       'viewer.previousPage': '上一页',
@@ -4159,6 +4238,9 @@ window.__ModuleLoader__.load({
       'viewer.loading': 'Reading preview…',
       'viewer.converting': 'Converting Office document…',
       'viewer.rendering': 'Rendering PDF pages…',
+      'viewer.comfort.hint': 'Large documents take 10–40s to render on first open; open with a desktop app anytime below.',
+      'viewer.quickOpenNative': 'Open in default app now',
+      'viewer.quickReveal': 'Reveal file',
       'viewer.renderFailed': 'PDF page rendering failed',
       'viewer.officeUnavailable': 'Office preview unavailable',
       'viewer.previousPage': 'Previous page',
