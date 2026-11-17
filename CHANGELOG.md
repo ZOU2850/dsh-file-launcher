@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.11
+
+### Fixed
+
+- **Office help no longer tells installed users to reinstall the plugin**: the failure card now explains that the plugin is already installed and the missing piece is the Host office-kit/LibreOffice Kit. It offers **Copy repair command** and **Host requirements** instead of a package download.
+- The copied instruction explicitly tells DSH not to reinstall `dsh-file-launcher`, to inspect the profile, install/enable the missing host provider and matching LibreOffice Kit, restart, and verify `health.officeKit === true`.
+
 ## 1.4.10
 
 ### Added
