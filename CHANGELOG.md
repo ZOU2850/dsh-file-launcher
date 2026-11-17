@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.12
+
+### Fixed
+
+- **Repair command no longer asks DSH to restart itself**: DSH cannot restart its own process. The copied command now asks DSH to install/report only; the user manually quits and reopens DSH, then asks DSH to verify `health.officeKit`.
+
 ## 1.4.11
 
 ### Fixed
