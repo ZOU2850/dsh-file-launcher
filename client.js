@@ -3070,6 +3070,32 @@ window.__ModuleLoader__.load({
             h('span', { className: 'dfl-foot-path', title: footPathText }, footPathText))
         }
 
+        function renderOfficeHelp(file) {
+          if (!isOfficeFile(file)) return null
+          const hostState = health === null
+            ? t('host.checking')
+            : health.officeKit === false ? t('host.officeKitMissing') : t('host.officeKitPresent')
+          return h('div', { className: 'dfl-office-help' },
+            h('p', { className: 'dfl-office-help-title' }, t('host.title')),
+            h('p', { className: 'dfl-office-help-text' }, t('host.officeHelp')),
+            h('p', { className: 'dfl-office-help-text' }, hostState),
+            h('ol', { className: 'dfl-office-help-steps' },
+              h('li', null, t('host.step1')),
+              h('li', null, t('host.step2')),
+              h('li', null, t('host.step3')),
+              h('li', null, t('host.step4'))),
+            h('div', { className: 'dfl-office-help-actions' },
+              h('a', {
+                className: 'dfl-button',
+                href: 'https://github.com/ZOU2850/dsh-file-launcher/releases/latest',
+                target: '_blank', rel: 'noreferrer',
+              }, t('host.downloadPackage')),
+              h('button', {
+                type: 'button', className: 'dfl-button',
+                onClick: () => void copyText(t('host.helpText')).then(ok => notify(ok ? t('host.copiedHelp') : t('toast.copyFailed'))),
+              }, t('host.copyHelp'))))
+        }
+
         function renderViewer() {
           if (viewer === null) return null
           const file = viewer.items[viewer.index]
@@ -3169,10 +3195,16 @@ window.__ModuleLoader__.load({
                   ? h('div', { className: 'dfl-viewer-status' },
                     h('p', { className: 'dfl-empty-title' }, t('viewer.failed')),
                     h('p', { className: 'dfl-empty-text' }, current.error),
-                    h('button', {
-                      type: 'button', className: 'dfl-button',
-                      onClick: () => preview(file),
-                    }, t('viewer.openSidebar')))
+                    renderOfficeHelp(file),
+                    isOfficeFile(file)
+                      ? (canNative ? h('button', {
+                        type: 'button', className: 'dfl-button',
+                        onClick: () => void openNative(file),
+                      }, t('viewer.openDefault')) : null)
+                      : h('button', {
+                        type: 'button', className: 'dfl-button',
+                        onClick: () => preview(file),
+                      }, t('viewer.openSidebar')))
                   : current.status === 'pages'
                     ? h('div', {
                       className: 'dfl-pdf-scroll',
@@ -3968,6 +4000,20 @@ window.__ModuleLoader__.load({
       'viewer.renderFailed': 'PDF 页面渲染失败',
       'viewer.officeUnavailable': 'Office 预览不可用',
       'viewer.officeHostMissing': '此宿主没有 Office 转换服务（office-kit）。请使用标准 DSH Desktop/Web 包，或安装 office-kit 与 LibreOffice 支持后重启。',
+      'viewer.openDefault': '用本机软件打开',
+      'host.title': 'Office 预览需要完整 DSH',
+      'host.officeHelp': '插件已加载客户端预览 provider；但 Office 转 PDF 需要宿主提供 office-kit 与 LibreOffice Kit。',
+      'host.checking': '正在检查当前宿主…',
+      'host.officeKitMissing': '当前宿主：缺少 office-kit',
+      'host.officeKitPresent': '当前宿主：office-kit 可用，但转换失败，请检查 LibreOffice Kit',
+      'host.step1': '1. 安装最新插件包（点击下方下载）',
+      'host.step2': '2. 使用官方 DSH Desktop 或官方 Web 完整包',
+      'host.step3': '3. 确认 health.officeKit = true',
+      'host.step4': '4. 完全退出并重开 DSH，而不是只刷新页面',
+      'host.downloadPackage': '下载最新插件包',
+      'host.copyHelp': '复制安装说明',
+      'host.copiedHelp': '安装说明已复制',
+      'host.helpText': 'Office 预览需要完整 DSH：\n1. 安装最新版 dsh-file-launcher\n2. 使用官方 DSH Desktop/Web 完整包\n3. 确认 /api/file-launcher.health 返回 officeKit: true\n4. 完全退出并重开 DSH\n下载：https://github.com/ZOU2850/dsh-file-launcher/releases/latest',
       'host.officeMissing': '当前宿主未提供 office-kit：Word/PPT 无法在插件内转换预览。Excel 可尝试侧边栏预览，或更新为标准 DSH Desktop/Web。',
       'viewer.previousPage': '上一页',
       'viewer.nextPage': '下一页',
@@ -4252,6 +4298,20 @@ window.__ModuleLoader__.load({
       'viewer.renderFailed': 'PDF page rendering failed',
       'viewer.officeUnavailable': 'Office preview unavailable',
       'viewer.officeHostMissing': 'This host has no Office conversion service (office-kit). Use a standard DSH Desktop/Web bundle, or install office-kit with LibreOffice support and restart.',
+      'viewer.openDefault': 'Open in default app',
+      'host.title': 'Office preview needs a complete DSH',
+      'host.officeHelp': 'The client preview provider is loaded; Office-to-PDF conversion still needs the Host office-kit and LibreOffice Kit.',
+      'host.checking': 'Checking the current host…',
+      'host.officeKitMissing': 'Current host: office-kit is missing',
+      'host.officeKitPresent': 'Current host: office-kit is present, but conversion failed; check the LibreOffice Kit',
+      'host.step1': '1. Install the latest plugin package (download below)',
+      'host.step2': '2. Use the official DSH Desktop or official Web bundle',
+      'host.step3': '3. Confirm /api/file-launcher.health returns officeKit: true',
+      'host.step4': '4. Fully quit and reopen DSH, not just reload the page',
+      'host.downloadPackage': 'Download latest package',
+      'host.copyHelp': 'Copy instructions',
+      'host.copiedHelp': 'Instructions copied',
+      'host.helpText': 'Office preview needs a complete DSH:\n1. Install the latest dsh-file-launcher\n2. Use the official DSH Desktop/Web bundle\n3. Confirm /api/file-launcher.health returns officeKit: true\n4. Fully quit and reopen DSH\nDownload: https://github.com/ZOU2850/dsh-file-launcher/releases/latest',
       'host.officeMissing': 'This host does not provide office-kit: Word/PowerPoint cannot be converted in the panel. Try Excel in the Sidebar preview, or update to a standard DSH Desktop/Web bundle.',
       'viewer.previousPage': 'Previous page',
       'viewer.nextPage': 'Next page',
@@ -5674,6 +5734,15 @@ body[data-ds-dark-theme] .dfl-icon[data-cat="other"]      { background: rgba(148
 }
 .dfl-viewer-status .dfl-empty-title { color: var(--dfl-ink); }
 .dfl-viewer-status .dfl-empty-text { word-break: break-word; }
+.dfl-office-help {
+  max-width: 560px; margin-top: 6px; padding: 12px 14px; text-align: left;
+  border: 0.5px solid var(--dfl-border-soft); border-radius: 10px; background: var(--dfl-bg-raised);
+}
+.dfl-office-help-title { margin: 0 0 6px; color: var(--dfl-ink); font-weight: 600; font-size: 13px; }
+.dfl-office-help-text { margin: 0 0 6px; color: var(--dfl-ink-2); font-size: 11px; line-height: 1.5; }
+.dfl-office-help-steps { margin: 6px 0 10px; padding-left: 18px; color: var(--dfl-ink-2); font-size: 11px; line-height: 1.65; }
+.dfl-office-help-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dfl-office-help-actions .dfl-button { display: inline-flex; align-items: center; text-decoration: none; }
 .dfl-viewer-foot {
   flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 7px 12px; border-top: 0.5px solid var(--dfl-border-soft);

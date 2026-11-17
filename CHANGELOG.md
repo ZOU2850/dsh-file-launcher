@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.9
+
+### Added
+
+- **Self-service Office help in the failure card**: when an Office preview fails, the plugin shows the host status, four concrete steps, a **Download latest package** link, and a **Copy instructions** button. Users no longer need an external explanation. The card keeps the explicit “Open in default app” action; there is still no automatic Sidebar redirect.
+
 ## 1.4.8
 
 ### Changed
