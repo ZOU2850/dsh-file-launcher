@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.7
+
+### Fixed
+
+- **Office host diagnostics**: `/api/file-launcher.health` now reports `officeKit` / `capabilities.officeKit`; the panel warns when the current Host lacks the conversion service instead of failing each Office preview with a generic message.
+- **Excel fallback**: when the Host reports no `officeKit`, `.xls/.xlsx/.xlsm` opens through the Sidebar's standard browser spreadsheet preview instead of the unavailable conversion path.
+- **Host documentation**: added `docs/HOST-REQUIREMENTS.md` covering the OfficeKit provider, LibreOffice Kit, client document-preview package, minimum DSH profile, and verification steps.
+
 ## 1.4.6
 
 ### Changed

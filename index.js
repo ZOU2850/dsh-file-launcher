@@ -21,7 +21,7 @@ export const name = 'file-launcher'
 export const inject = ['tools', 'fs', 'sessionQuery', 'connection']
 
 /** Package version reported by the health route and the plugin detail document. */
-export const VERSION = typeof pkg?.version === 'string' ? pkg.version : '1.4.6'
+export const VERSION = typeof pkg?.version === 'string' ? pkg.version : '1.4.7'
 
 /** Normalize a Cordis registration result (function or `{ dispose }`) into a cleanup callback. */
 function toDisposer(disposable) {

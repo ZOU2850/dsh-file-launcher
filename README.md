@@ -93,7 +93,7 @@ No plugin config is required. Optional environment variables:
 
 - Files created only by shell commands without a tool result or `present` declaration are attributed to the workspace, not the conversation.
 - Native opening requires a Host desktop.
-- Office in-panel preview depends on the profile's `office-kit` provider.
+- Office in-panel preview depends on the profile's `office-kit` provider and LibreOffice Kit. Excel falls back to the Sidebar preview when `officeKit` is unavailable. Host packages, versions, and diagnostics are documented in [`docs/HOST-REQUIREMENTS.md`](docs/HOST-REQUIREMENTS.md).
 - PDF page rendering depends on local `pdfinfo` / `pdftoppm`; without them the preview shows an error and keeps **Open in sidebar**.
 - A folder `@path` gets an Explorer entry; its contents are not expanded recursively.
 - **Sent by me** reads up to 20 recent top-level conversations, sequentially and only on first access. The index is persisted in `$DSH_HOME/file-launcher/sent-index.json` (can be rebuilt on demand with **Refresh**); startup never prewarms it.
