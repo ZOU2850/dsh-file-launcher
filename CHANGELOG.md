@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.13
+
+### Changed
+
+- Office failure help now uses the original install command again, but explicitly asks the user to hand it to **another agent** to download/install. It still tells DSH not to restart itself; the user restarts DSH manually, then checks officeKit.
+
 ## 1.4.12
 
 ### Fixed
