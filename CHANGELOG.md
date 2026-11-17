@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.6
+
+### Changed
+
+- Shared Session metadata/Session-record reads and a short-lived metadata cache, with per-view prefetching; project scope can open its directory without replaying the conversation first.
+- Workspace scans share one pending operation and cancel idle work, so overlapping refreshes no longer queue duplicate directory walks.
+- Session observations are rented only while events are consumed and disposed before filesystem I/O.
+
+### Fixed
+
+- Pin/archive manifests with an unrecognized shape or version are now treated as unreadable instead of silently read as empty; writes refuse to overwrite them.
+- Archive copies use exclusive creation with numbered collision names, preventing a concurrent copy from overwriting an existing file.
+
 ## 1.4.5
 
 ### Fixed
