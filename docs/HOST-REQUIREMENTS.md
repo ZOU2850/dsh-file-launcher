@@ -16,7 +16,7 @@
    - 官方 Desktop/Web 包会带匹配的原生包或 WASM；
    - 自组装 profile 可能只有 provider，没有 LibreOffice 引擎，转换会失败。
 
-Excel `.xlsx/.xls/.xlsm` 在标准 DSH 中由浏览器表格 renderer 处理，不依赖 Office 转换；本插件在检测到 Host 没有 `officeKit` 时会尝试打开侧边栏的 Excel 预览。
+Excel `.xlsx/.xls/.xlsm` 在本插件里同样通过 `officeKit` 转 PDF，宿主没有转换服务就不能预览；插件不会自动跳转侧边栏，只在错误卡片提供用户主动点击的“在侧边栏打开”。
 
 ## 检查当前宿主
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.8
+
+### Changed
+
+- **Office preview is always in-panel**: removed the automatic Sidebar redirect. A failed Office conversion stays in the plugin with its error and an explicit, optional “Open in Sidebar” action.
+- **Load the document-preview provider with the plugin**: `@deepseek-ai/dsh-client-ui-sidebar-documentpreview` is now part of `dsh.client.inject`, so a fresh standard DSH install has the `remote.officeKit` provider available without relying on another UI having opened it first.
+- **No feature mixing**: automatic Excel/Word/PowerPoint fallback to the Sidebar is gone. The Sidebar is only a user-chosen action on an error card.
+
+### Fixed
+
+- Host diagnostics from 1.4.7 remain: `health.officeKit` and a visible host warning when the conversion service is absent.
+
 ## 1.4.7
 
 ### Fixed

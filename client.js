@@ -1664,13 +1664,9 @@ window.__ModuleLoader__.load({
               if (isOfficeFile(file)) {
                 const officeKit = officeKitRef?.value || (ctx.remote && ctx.remote.officeKit)
                 if (officeKit === undefined) {
-                  // Fall back to the host's own document preview. It may have a
-                  // separately mounted officeKit/client provider, and it handles
-                  // Excel without conversion.
-                  setViewer(null)
-                  preview(file)
-                  notify(t('viewer.officeSidebarFallback'))
-                  return
+                  throw new Error(health && health.officeKit === false
+                    ? t('viewer.officeHostMissing')
+                    : t('viewer.officeUnavailable'))
                 }
                 const result = await officeKit.render(sourceSession, file.path, 'foreground', controller.signal)
                 controller.signal.throwIfAborted()
@@ -1721,7 +1717,7 @@ window.__ModuleLoader__.load({
             if (objectUrl !== undefined) URL.revokeObjectURL(objectUrl)
             if (viewerUrl.current === objectUrl) viewerUrl.current = null
           }
-        }, [viewer, ctx, inventorySessionId, sessionId, t, renderPdfPages, health, preview])
+        }, [viewer, ctx, inventorySessionId, sessionId, t, renderPdfPages, health])
 
         useEffect(() => {
           if (viewer === null) return undefined
@@ -3971,8 +3967,7 @@ window.__ModuleLoader__.load({
       'viewer.quickReveal': '定位原文件',
       'viewer.renderFailed': 'PDF 页面渲染失败',
       'viewer.officeUnavailable': 'Office 预览不可用',
-      'viewer.officeHostMissing': '此宿主没有 Office 转换服务（office-kit）。请使用标准 DSH Desktop/Web 包，或安装 office-kit 与 LibreOffice 支持后重启；Excel 可尝试在侧边栏打开。',
-      'viewer.officeSidebarFallback': '插件内转换不可用，已切到侧边栏文档预览',
+      'viewer.officeHostMissing': '此宿主没有 Office 转换服务（office-kit）。请使用标准 DSH Desktop/Web 包，或安装 office-kit 与 LibreOffice 支持后重启。',
       'host.officeMissing': '当前宿主未提供 office-kit：Word/PPT 无法在插件内转换预览。Excel 可尝试侧边栏预览，或更新为标准 DSH Desktop/Web。',
       'viewer.previousPage': '上一页',
       'viewer.nextPage': '下一页',
@@ -4256,8 +4251,7 @@ window.__ModuleLoader__.load({
       'viewer.quickReveal': 'Reveal file',
       'viewer.renderFailed': 'PDF page rendering failed',
       'viewer.officeUnavailable': 'Office preview unavailable',
-      'viewer.officeHostMissing': 'This host has no Office conversion service (office-kit). Use a standard DSH Desktop/Web bundle, or install office-kit with LibreOffice support and restart; try Excel in the Sidebar preview.',
-      'viewer.officeSidebarFallback': 'In-panel conversion unavailable; opened the Sidebar document preview',
+      'viewer.officeHostMissing': 'This host has no Office conversion service (office-kit). Use a standard DSH Desktop/Web bundle, or install office-kit with LibreOffice support and restart.',
       'host.officeMissing': 'This host does not provide office-kit: Word/PowerPoint cannot be converted in the panel. Try Excel in the Sidebar preview, or update to a standard DSH Desktop/Web bundle.',
       'viewer.previousPage': 'Previous page',
       'viewer.nextPage': 'Next page',

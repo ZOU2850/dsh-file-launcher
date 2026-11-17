@@ -1,7 +1,7 @@
 # QA / 兼容性检查
 
 检查时间：2026-11-15  
-版本：dsh-file-launcher 1.4.7  
+版本：dsh-file-launcher 1.4.8  
 运行环境：DeepSeek Harness Desktop 0.2.2-rc.3，Electron 44.7，Node 24.21，Windows
 
 ## 自动化检查

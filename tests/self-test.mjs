@@ -402,7 +402,7 @@ try {
   assert.notEqual(pkg.dsh?.client?.immediately, true, 'community plugin must not block stage-1 startup')
   const clientPkgInject = Array.isArray(pkg.dsh?.client?.inject) ? pkg.dsh.client.inject : []
   assert.ok(!clientPkgInject.includes('@deepseek-ai/dsh-client-ui-file-drag'))
-  assert.ok(!clientPkgInject.includes('@deepseek-ai/dsh-client-ui-sidebar-documentpreview'))
+  assert.ok(clientPkgInject.includes('@deepseek-ai/dsh-client-ui-sidebar-documentpreview'))
 
   /* ── real-disk local fast-path, mtime-first sort & live new-file detection ── */
   const realWs = join(root, 'real-ws')
