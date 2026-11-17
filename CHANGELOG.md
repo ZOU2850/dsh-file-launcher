@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.10
+
+### Added
+
+- **Copy command** in the in-panel Office help card: users can copy a ready-to-send DSH instruction (repository, latest release, remove old version, restart, and officeKit check) and paste it into DSH so the agent can download/install on their behalf.
+
 ## 1.4.9
 
 ### Added

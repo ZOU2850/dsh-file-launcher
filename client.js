@@ -3092,8 +3092,9 @@ window.__ModuleLoader__.load({
               }, t('host.downloadPackage')),
               h('button', {
                 type: 'button', className: 'dfl-button',
-                onClick: () => void copyText(t('host.helpText')).then(ok => notify(ok ? t('host.copiedHelp') : t('toast.copyFailed'))),
-              }, t('host.copyHelp'))))
+                onClick: () => void copyText(t('host.commandText')).then(ok => notify(ok ? t('host.copiedCommand') : t('toast.copyFailed'))),
+              }, t('host.copyCommand'))),
+            h('p', { className: 'dfl-office-help-hint' }, t('host.commandHint')))
         }
 
         function renderViewer() {
@@ -4011,9 +4012,10 @@ window.__ModuleLoader__.load({
       'host.step3': '3. 确认 health.officeKit = true',
       'host.step4': '4. 完全退出并重开 DSH，而不是只刷新页面',
       'host.downloadPackage': '下载最新插件包',
-      'host.copyHelp': '复制安装说明',
-      'host.copiedHelp': '安装说明已复制',
-      'host.helpText': 'Office 预览需要完整 DSH：\n1. 安装最新版 dsh-file-launcher\n2. 使用官方 DSH Desktop/Web 完整包\n3. 确认 /api/file-launcher.health 返回 officeKit: true\n4. 完全退出并重开 DSH\n下载：https://github.com/ZOU2850/dsh-file-launcher/releases/latest',
+      'host.copyCommand': '复制指令',
+      'host.copiedCommand': '指令已复制',
+      'host.commandHint': '把指令粘贴发送给 DSH，让 DSH 代为下载并安装。',
+      'host.commandText': '请帮我下载并安装最新版 dsh-file-launcher（文件启动器）：\n- 仓库：https://github.com/ZOU2850/dsh-file-launcher\n- Release：https://github.com/ZOU2850/dsh-file-launcher/releases/latest\n- 先移除或禁用旧的同名 dsh-file-launcher，避免重复；再把最新包安装到当前 DSH profile。\n- 安装完成后完全退出并重新打开 DSH，不要只刷新页面。\n- 检查 /api/file-launcher.health 的 officeKit 是否为 true；如果为 false，请检查或安装 @deepseek-ai/dsh-office-kit 与 LibreOffice Kit，然后再重启。',
       'host.officeMissing': '当前宿主未提供 office-kit：Word/PPT 无法在插件内转换预览。Excel 可尝试侧边栏预览，或更新为标准 DSH Desktop/Web。',
       'viewer.previousPage': '上一页',
       'viewer.nextPage': '下一页',
@@ -4309,9 +4311,10 @@ window.__ModuleLoader__.load({
       'host.step3': '3. Confirm /api/file-launcher.health returns officeKit: true',
       'host.step4': '4. Fully quit and reopen DSH, not just reload the page',
       'host.downloadPackage': 'Download latest package',
-      'host.copyHelp': 'Copy instructions',
-      'host.copiedHelp': 'Instructions copied',
-      'host.helpText': 'Office preview needs a complete DSH:\n1. Install the latest dsh-file-launcher\n2. Use the official DSH Desktop/Web bundle\n3. Confirm /api/file-launcher.health returns officeKit: true\n4. Fully quit and reopen DSH\nDownload: https://github.com/ZOU2850/dsh-file-launcher/releases/latest',
+      'host.copyCommand': 'Copy command',
+      'host.copiedCommand': 'Command copied',
+      'host.commandHint': 'Paste the command into DSH and ask it to download and install the package for you.',
+      'host.commandText': 'Please download and install the latest dsh-file-launcher for me:\n- Repository: https://github.com/ZOU2850/dsh-file-launcher\n- Release: https://github.com/ZOU2850/dsh-file-launcher/releases/latest\n- Remove or disable any old dsh-file-launcher first, then install the latest package into the current DSH profile.\n- Fully quit and reopen DSH after installation; do not just refresh the page.\n- Check /api/file-launcher.health: officeKit must be true. If it is false, check or install @deepseek-ai/dsh-office-kit and the LibreOffice Kit, then restart.',
       'host.officeMissing': 'This host does not provide office-kit: Word/PowerPoint cannot be converted in the panel. Try Excel in the Sidebar preview, or update to a standard DSH Desktop/Web bundle.',
       'viewer.previousPage': 'Previous page',
       'viewer.nextPage': 'Next page',
@@ -5743,6 +5746,7 @@ body[data-ds-dark-theme] .dfl-icon[data-cat="other"]      { background: rgba(148
 .dfl-office-help-steps { margin: 6px 0 10px; padding-left: 18px; color: var(--dfl-ink-2); font-size: 11px; line-height: 1.65; }
 .dfl-office-help-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dfl-office-help-actions .dfl-button { display: inline-flex; align-items: center; text-decoration: none; }
+.dfl-office-help-hint { margin: 8px 0 0; color: var(--dfl-ink-3); font-size: 10px; }
 .dfl-viewer-foot {
   flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 7px 12px; border-top: 0.5px solid var(--dfl-border-soft);
